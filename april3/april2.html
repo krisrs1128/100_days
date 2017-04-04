@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="april2.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+        <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+    </head>
+
+    <body>
+        <div id="rw_div"></div>
+        <script>
+         var svg_elem = d3.select("#rw_div")
+                          .append("svg")
+                          .attrs({
+                              "height": 400,
+                              "width": 400
+                          });
+         var n_row = 5;
+         var n_col = 10;
+         var x = initialize_data(n_row, n_col);
+         var fill_scale = d3.scaleOrdinal()
+                            .domain([0, 1])
+                            .range(["#75B998", "#B1A7C0"]);
+         initialize_display(svg_elem, x, fill_scale);
+         d3.interval(
+             function() {
+                 update_display(svg_elem, x, fill_scale);
+                 x_star = x.slice();
+                 x_star[0] = take_step(x[0], 0.1);
+                 for (var j = 1; j < n_row; j++ ) {
+                     x_star[j] = x[j - 1];
+                 }
+                 x = x_star;
+                 console.log(x[1]);
+             },
+             1000
+         )
+
+         /* d3.interval(draw_walk, 500);*/
+
+        </script>
+    </body>
+</html>
