@@ -23,22 +23,16 @@ var dispcreatc = d3.dispatch("active", "progress");
 // Utils
 
 
-function position() {
-  var pos = window.pageYOffset - 10;
-  var sectionIndex = d3.bisect(sectionPositions, pos);
-  sectionIndex = Math.min(sections.size() - 1, sectionIndex);
-
-  if (currentIndex !== sectionIndex) {
-    dispatch.active(sectionIndex);
-    currentIndex = sectionIndex;
-  }
-
-  var prevIndex = Math.max(sectionIndex - 1, 0);
-  var prevTop = sectionPositions[prevIndex];
-  var progress = (pos - prevTop) / (sectionPositions[sectionIndex] - prevTop);
-  dispatch.progress(currentIndex, progress);
-}
+chart.activate = function(index) {
+  activeIndex = index;
+  var sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
+  var scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
+  scrolledSections.forEach(function(i) {
+    activateFunctions[i]();
+  });
+  lastIndex = activeIndex;
+};
 
 scroll.on('active', function(index){
   d3.rebind(scroll, dispatch, "on");
-}
+});
