@@ -6,24 +6,27 @@ var margin = {
   "top": 20
 };
 
-var width = 300;
-var height = 200;
+var width = 300 - margin.left - margin.right;
+var height = 200 - margin.top - margin.bottom;
 
 var svg = d3.select("#chart")
-    .append("svg");
+    .append("svg")
+    .attrs({
+      "width": margin.left + width + margin.right,
+      "height": height + margin.top + margin.bottom
+    });
 
-svg.attrs({
-  "width": margin.left + width + margin.right,
-  "height": height + margin.top + margin.bottom
-});
+var wrapper = svg
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var x_scale = d3.scaleLinear()
     .domain([0, 1])
-    .range([margin.left, width - margin.right]);
+    .range([0, width]);
 
 var y_scale = d3.scaleLinear()
     .domain([0, 1])
-    .range([height - margin.top, margin.bottom]);
+    .range([height, 0]);
 
 var x_axis = d3.axisBottom()
     .ticks(2)
@@ -32,18 +35,15 @@ var y_axis = d3.axisLeft()
     .ticks(2)
     .scale(y_scale);
 
-svg.append("g")
+wrapper.append("g")
   .attrs({
     "class": "x axis",
     "transform": "translate(" + 0 + "," + height + ")"
   })
   .call(x_axis);
 
-svg.append("g")
-  .attrs({
-    "class": "y axis",
-    "transform": "translate(" + margin.left + ",0)"
-  })
+wrapper.append("g")
+  .attrs({"class": "y axis"})
   .call(y_axis);
 
 var data = [];
@@ -54,19 +54,22 @@ for (var i = 0; i < 100; i++) {
   });
 }
 
-svg.selectAll(".sample")
+wrapper.selectAll(".sample")
   .data(data)
   .enter()
   .append("circle")
   .attrs({
-    "class": "sample",
+    "class": function(d, i) { return "sample" + i; },
     "cx": function(d) { return x_scale(d.x); },
     "cy": function(d) { return y_scale(d.y); },
     "r": 0.5,
     "fill": "black"
-  })
-  .on("mouseover", show_tooltip)
-  .on("mouseout", remove_tooltip);
+  });
+
+var voronoi = d3.voronoi()
+    .x(function(d) { return x_scale(d.x); })
+    .y(function(d) { return y_scale(d.y); })
+    //.clipExtent([[0, 0], [width, height]]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Show / hide tooltip
