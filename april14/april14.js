@@ -69,7 +69,22 @@ wrapper.selectAll(".sample")
 var voronoi = d3.voronoi()
     .x(function(d) { return x_scale(d.x); })
     .y(function(d) { return y_scale(d.y); })
-    //.clipExtent([[0, 0], [width, height]]);
+    .extent([[0, 0], [width, height]]);
+
+wrapper.selectAll("path")
+  .data(voronoi(data).polygons())
+  .enter()
+  .append("path")
+  .attr("d", function(d, i) { return "M" + d.join("L") + "Z"; })
+  .datum(function(d, i) { return d.point; })
+  .attrs({
+    "class": function(d, i) { return "voronoi" + i; },
+    "fill": "none",
+    "stroke": "#2074A0"
+  })
+  .style("pointer-events", "all")
+  .on("mouseover", show_tooltip)
+  .on("mouseout", remove_tooltip);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Show / hide tooltip
@@ -92,7 +107,7 @@ function show_tooltip(d) {
     trigger: "manual",
     html: true,
     content: function() {
-      return "<span style='font-size': 11px; text-align: center;'>" + d.x.toFixed(2) + "," + d.y.toFixed(2) + "</span>"
+      return "<span style='font-size': 11px; text-align: center;'>hi</span>"
     }
   });
 
