@@ -64,4 +64,27 @@ svg.selectAll(".sample")
     "cy": function(d) { return y_scale(d.y); },
     "r": 0.5,
     "fill": "black"
+  })
+  .on("mouseover", show_tooltip);
+
+///////////////////////////////////////////////////////////////////////////////
+// Show / hide tooltip
+///////////////////////////////////////////////////////////////////////////////
+
+function show_tooltip(d) {
+  $(this).popover({
+    placement: "auto top",
+    container: "#chart",
+    trigger: "manual",
+    html: true,
+    content: function() {
+      return "<span style='font-size': 11px; text-align: center;'>" + d.x.toFixed(2) + "," + d.y.toFixed(2) + "</span>"
+    }
   });
+
+  $(this).popover("show");
+  d3.select(this)
+    .transition()
+    .duration(500)
+    .attr("r", 1.5);
+}
