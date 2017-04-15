@@ -96,23 +96,10 @@ function remove_tooltip(d) {
   element.transition()
     .duration(100)
     .style("r", 0.5);
-  $(".popover").each(function() {
-    $(element).remove();
-  });
 }
 
 function show_tooltip(d) {
   var element = d3.selectAll(".sample" + d.data.id);
-  $(element).popover({
-    placement: "auto top",
-    container: "#chart",
-    trigger: "manual",
-    html: true,
-    content: function() {
-      return d.data.id;
-    }
-  });
-
   element.transition()
     .duration(100)
     .style("r", 2.5);
