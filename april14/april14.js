@@ -49,6 +49,7 @@ wrapper.append("g")
 var data = [];
 for (var i = 0; i < 100; i++) {
   data.push({
+    "id": i,
     "x": Math.random(),
     "y": Math.random()
   });
@@ -76,13 +77,13 @@ wrapper.selectAll("path")
   .enter()
   .append("path")
   .attr("d", function(d, i) { return "M" + d.join("L") + "Z"; })
-  .datum(function(d, i) { return d.point; })
+  // .datum(function(d, i) { return d.point; })
   .attrs({
-    "class": function(d, i) { return "voronoi" + i; },
+    "class": function(d, i) { return "voronoi" + d.id; },
     "fill": "none",
+    "pointer-events": "all",
     "stroke": "#2074A0"
   })
-  .style("pointer-events", "all")
   .on("mouseover", show_tooltip)
   .on("mouseout", remove_tooltip);
 
@@ -91,8 +92,8 @@ wrapper.selectAll("path")
 ///////////////////////////////////////////////////////////////////////////////
 
 function remove_tooltip(d) {
-  d3.select(this)
-    .transition()
+  var element = d3.selectAll(".sample" + d.data.id);
+  element.transition()
     .duration(500)
     .style("r", 0.5);
   $(".popover").each(function() {
@@ -101,19 +102,20 @@ function remove_tooltip(d) {
 }
 
 function show_tooltip(d) {
-  $(this).popover({
+  var element = d3.selectAll(".sample" + d.data.id);
+  console.log(element.nodes());
+  $(element).popover({
     placement: "auto top",
     container: "#chart",
     trigger: "manual",
     html: true,
     content: function() {
-      return "<span style='font-size': 11px; text-align: center;'>hi</span>"
+      return d.data.id;
     }
   });
 
-  $(this).popover("show");
-  d3.select(this)
-    .transition()
+  $(element).popover("show");
+  element.transition()
     .duration(500)
     .style("r", 2.5);
 }
