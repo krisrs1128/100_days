@@ -65,11 +65,22 @@ svg.selectAll(".sample")
     "r": 0.5,
     "fill": "black"
   })
-  .on("mouseover", show_tooltip);
+  .on("mouseover", show_tooltip)
+  .on("mouseout", remove_tooltip);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Show / hide tooltip
 ///////////////////////////////////////////////////////////////////////////////
+
+function remove_tooltip(d) {
+  d3.select(this)
+    .transition()
+    .duration(500)
+    .style("r", 0.5);
+  $(".popover").each(function() {
+    $(this).remove();
+  });
+}
 
 function show_tooltip(d) {
   $(this).popover({
@@ -86,5 +97,5 @@ function show_tooltip(d) {
   d3.select(this)
     .transition()
     .duration(500)
-    .attr("r", 1.5);
+    .style("r", 2.5);
 }
