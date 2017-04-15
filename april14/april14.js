@@ -94,16 +94,15 @@ wrapper.selectAll("path")
 function remove_tooltip(d) {
   var element = d3.selectAll(".sample" + d.data.id);
   element.transition()
-    .duration(500)
+    .duration(100)
     .style("r", 0.5);
   $(".popover").each(function() {
-    $(this).remove();
+    $(element).remove();
   });
 }
 
 function show_tooltip(d) {
   var element = d3.selectAll(".sample" + d.data.id);
-  console.log(element.nodes());
   $(element).popover({
     placement: "auto top",
     container: "#chart",
@@ -114,8 +113,7 @@ function show_tooltip(d) {
     }
   });
 
-  $(element).popover("show");
   element.transition()
-    .duration(500)
+    .duration(100)
     .style("r", 2.5);
 }
