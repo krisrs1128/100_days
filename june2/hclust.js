@@ -32,3 +32,27 @@ elem.append("rect")
     "width": 1000,
     "height": 1000
   });
+
+d3.cluster()(root);
+depths(root);
+
+var ids = root.descendants().map(function(d) { return d.id; });
+var leaf_depths = root.leaves().map(function(d) { return d.data.depth; });
+
+var scales = {
+  "x": d3.scaleBand()
+    .domain(ids)
+    .range([0, 1000]),
+  "y": d3.scaleLinear()
+    .domain([0, d3.max(leaf_depths)])
+    .range([0, 1000])
+};
+
+elem.selectAll(".node")
+  .data(root.descendants()).enter()
+  .append("circle")
+  .attrs({
+    "cx": function(d) { return scales.x(d.id); },
+    "cy": function(d) { return scales.y(d.data.depth); },
+    "r": 5
+  });
