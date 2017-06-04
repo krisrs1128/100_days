@@ -23,6 +23,7 @@ function update_heatmap_focus(elem, hierarchy, query_id, x_scale) {
   var x_extent = d3.extent(cur_x);
   elem.selectAll(".hm_focus")
     .transition()
+    .duration(500)
     .attrs({
       "x": x_scale(x_extent[0]),
       "y": height / 5,

@@ -52,6 +52,9 @@ elem.selectAll(".hcnode")
     "class": "hcnode",
     "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
+  })
+  .on("mouseover", function(d) {
+    update_heatmap_focus(elem, root, d.id, scales.tree_x);
   });
 
 var link_fun = d3.linkVertical()
