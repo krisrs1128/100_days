@@ -63,7 +63,7 @@ join_sources <- function(x, taxa, samples, dendro, h = 0.5) {
 ## ---- data ----
 download.file("https://github.com/krisrs1128/treelapse/raw/master/data/abt.rda", "abt.rda")
 abt <- get(load("abt.rda")) %>%
-  filter_taxa(function(x) { var(x) > 5 }, TRUE)
+  filter_taxa(function(x) { var(x) > 10 }, TRUE)
 
 x <- t(get_taxa(abt))
 
@@ -103,17 +103,6 @@ mix_dendro <- reorder(as.dendrogram(mix_tree), -colMeans(x))
 mx <- join_sources(x, taxa, samples, mix_dendro, h = 0)
 
 ## ---- write-js ---
-js_data <- mx %>%
-  ungroup() %>%
-  arrange(leaf_ix) %>%
-  dplyr::select(sample, rsv, label, scaled) %>%
-  rename(
-    column = rsv,
-    row = sample,
-    value = scaled
-  )
-
-cat(sprintf("var data = %s;", jsonlite::toJSON(js_data)), file = "~/Desktop/100_days/june2/data.js")
 phy <- as.phylo(mix_dendro)
 plot(phy)
 phy_data <- get("last_plot.phylo", envir = .PlotPhyloEnv)
@@ -123,12 +112,35 @@ node_data <- data_frame(
   y = -phy_data$xx,
   x = phy_data$yy
 )
+
+library("plyr")
 phy_df <- as_data_frame(phy$edge) %>%
-  rename(id = V1, child = V2) %>%
+  rename(parent = V1, id = V2) %>%
   left_join(node_data)
+mapping <- setNames(phy$tip, seq_along(phy$tip))
 phy_df <- rbind(
   phy_df,
-  data_frame(id = "", child = "621", y = 0.03, x = mean(phy_df$x))
-)
+  data_frame(parent = "", id = phy$edge[1, 1], y = 0.03, x = mean(phy_df$x))
+) %>%
+  mutate(
+    id = revalue(as.character(id), mapping)
+  )
 
 cat(sprintf("var tree = %s;", jsonlite::toJSON(phy_df)), file = "~/Desktop/100_days/june2/tree.js")
+
+js_data <- mx %>%
+  ungroup() %>%
+  arrange(leaf_ix) %>%
+  dplyr::select(sample, rsv, label, scaled) %>%
+  rename(
+    column = rsv,
+    row = sample,
+    value = scaled
+  ) %>%
+  left_join(
+    phy_df %>%
+    rename(column = id) %>%
+    select(-y, -parent)
+  )
+
+cat(sprintf("var data = %s;", jsonlite::toJSON(js_data)), file = "~/Desktop/100_days/june2/data.js")
