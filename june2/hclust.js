@@ -3,22 +3,6 @@ var root = d3.stratify()
     .id(function(d) { return d.id; })
     .parentId(function(d) { return d.parent; })(tree);
 
-function depths(root) {
-  if (root.parent === null) {
-    root.data.depth = 0;
-  } else {
-    root.data.depth = root.parent.data.depth + root.data.edge_length;
-  }
-
-  if (Object.keys(root).indexOf("children") == -1) {
-    return;
-  } else {
-    for (var i = 0; i < root.children.length; i++) {
-      depths(root.children[i]);
-    }
-  }
-}
-
 var elem_height = 700;
 var elem_width = 1200;
 var elem = d3.select("#vis")
@@ -35,6 +19,7 @@ elem.append("rect")
     "height": elem_height
   });
 
+// Build scales
 d3.cluster()(root);
 var coords = {
   "x": root.descendants().map(function(d) { return d.data.x; }),
@@ -59,6 +44,7 @@ var scales = {
     .range([elem_height / 5 - 10, 0])
 };
 
+// Draw the tree
 elem.selectAll(".hcnode")
   .data(root.descendants(), function(d) { return d.id; }).enter()
   .append("circle")
@@ -80,6 +66,7 @@ elem.selectAll(".link")
     "d": link_fun
   });
 
+// Draw the heatmap
 elem.selectAll(".tile")
   .data(data).enter()
   .append("rect")
