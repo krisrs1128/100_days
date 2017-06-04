@@ -78,3 +78,9 @@ elem.selectAll(".tile")
     "height": scales.tile_y.bandwidth(),
     "fill": function(d) { return scales.tile_fill(d.value); }
   });
+
+// highlight the selected nodes
+elem.append("rect")
+  .attrs({
+    "class": "hm_focus"
+  });
