@@ -1,13 +1,11 @@
 
 .link {
     fill: none;
-    stroke: #555;
     stroke-opacity: 0.4;
     stroke-width: 1.5px;
 }
 
 .hcnode {
     r: 3;
-    fill: #555;
     fill-opacity: 0.4;
 }

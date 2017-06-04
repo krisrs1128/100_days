@@ -50,11 +50,14 @@ elem.selectAll(".hcnode")
   .append("circle")
   .attrs({
     "class": "hcnode",
+    "fill": "#555",
     "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
   })
   .on("mouseover", function(d) {
-    update_heatmap_focus(elem, root, d.id, scales.tree_x);
+    var cur_tree = subtree(root, d.id);
+    update_heatmap_focus(elem, cur_tree, scales.tree_x);
+    update_tree_focus(elem, cur_tree, scales.tree_x);
   });
 
 var link_fun = d3.linkVertical()
@@ -66,6 +69,7 @@ elem.selectAll(".link")
   .append("path")
   .attrs({
     "class": "link",
+    "stroke": "#555",
     "d": link_fun
   });
 
