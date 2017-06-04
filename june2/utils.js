@@ -33,33 +33,63 @@ function update_heatmap_focus(elem, cur_tree, x_scale) {
     });
 }
 
+var fill_fun = function(cur_labels, d, type) {
+  var indic;
+  if (type == "node") {
+    indic = cur_labels.indexOf(d.id);
+  } else if (type == "data_focus") {
+    indic = cur_labels.indexOf(d.column);
+  } else {
+    indic = cur_labels.indexOf(d.source.id);
+  }
+
+  if (indic != -1) {
+    return "red";
+  }
+  return "#555";
+};
+
 function update_tree_focus(elem, cur_tree, x_scale) {
   var cur_labels = cur_tree.descendants().map(function(d) {return d.id;});
-
-  var fill_fun = function(d, type) {
-    var indic;
-    if (type == "node") {
-      indic = cur_labels.indexOf(d.id);
-    } else {
-      indic = cur_labels.indexOf(d.source.id);
-    }
-    if (indic != -1) {
-      return "red";
-    }
-    return "#555";
-  };
-
   elem.selectAll(".hcnode")
     .transition()
     .duration(500)
     .attrs({
-      "fill": function(d) { return fill_fun(d, "node"); }
+      "fill": function(d) { return fill_fun(cur_labels, d, "node"); }
     });
 
   elem.selectAll(".link")
     .transition()
     .duration(500)
     .attrs({
-      "stroke": function(d) { return fill_fun(d, "link"); }
+      "stroke": function(d) { return fill_fun(cur_labels, d, "link"); }
+    });
+}
+
+function update_data_focus(elem, cur_tree, x_scale) {
+  var cur_labels = cur_tree.descendants().map(function(d) {return d.id;});
+
+  elem.selectAll(".data_focus")
+    .transition()
+    .duration(500)
+    .attrs({
+      "stroke": function(d) {
+        if (cur_labels.indexOf(d[0].column) == -1) {
+          return "#555";
+        }
+        return "red";
+      },
+      "stroke-opacity": function(d) {
+        if (cur_labels.indexOf(d[0].column) == -1) {
+          return 0.05;
+        }
+        return 0.1;
+      },
+      "stroke-width": function(d) {
+        if (cur_labels.indexOf(d[0].column) == -1) {
+          return 0.2;
+        }
+        return 3;
+      }
     });
 }

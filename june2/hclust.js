@@ -3,7 +3,7 @@ var root = d3.stratify()
     .id(function(d) { return d.id; })
     .parentId(function(d) { return d.parent; })(tree);
 
-var elem_height = 700;
+var elem_height = 350;
 var elem_width = 1200;
 var elem = d3.select("#vis")
     .append("svg")
@@ -38,10 +38,16 @@ var scales = {
     .range(["#f8f8f8", "black"]),
   "tree_x": d3.scaleLinear()
     .domain(d3.extent(coords.x))
-    .range([0, elem_width]),
+    .range([0, 0.6 * elem_width]),
   "tree_y": d3.scaleLinear()
     .domain(d3.extent(coords.y))
-    .range([elem_height / 5 - 10, 0])
+    .range([elem_height / 5 - 10, 0]),
+  "centroid_x": d3.scaleBand()
+    .domain(rows)
+    .range([0.61 * elem_width, elem_width]),
+  "centroid_y": d3.scaleLinear()
+    .domain(d3.extent(fill_vals))
+    .range([elem_height, 0])
 };
 
 // Draw the tree
@@ -58,6 +64,7 @@ elem.selectAll(".hcnode")
     var cur_tree = subtree(root, d.id);
     update_heatmap_focus(elem, cur_tree, scales.tree_x);
     update_tree_focus(elem, cur_tree, scales.tree_x);
+    update_data_focus(elem, cur_tree, scales.tree_x);
   });
 
 var link_fun = d3.linkVertical()
@@ -74,6 +81,7 @@ elem.selectAll(".link")
   });
 
 // Draw the heatmap
+var bandwidth = scales.tree_x.range()[1] / (scales.tree_x.domain()[1] - scales.tree_x.domain()[0]);
 elem.selectAll(".tile")
   .data(data).enter()
   .append("rect")
@@ -81,13 +89,28 @@ elem.selectAll(".tile")
     "class": "tile",
     "x": function(d) { return scales.tree_x(d.x); },
     "y": function(d) { return scales.tile_y(d.row); },
-    "width": 100,
+    "width": bandwidth,
     "height": scales.tile_y.bandwidth(),
     "fill": function(d) { return scales.tile_fill(d.value); }
   });
 
-// highlight the selected nodes
 elem.append("rect")
+  .attrs({"class": "hm_focus"});
+
+var test_line = d3.line()
+    .x(function(d) {
+      return scales.centroid_x(d.row); })
+    .y(function(d) {
+      return scales.centroid_y(d.value); });
+
+// draw the centroids
+elem.selectAll(".data_focus")
+  .data(ts_data).enter()
+  .append("path")
   .attrs({
-    "class": "hm_focus"
-  });
+    "class": "data_focus",
+    "stroke-opacity": 0.2,
+    "stroke-width": 0.2,
+    "stroke": "#555"
+  })
+  .attr("d", test_line);

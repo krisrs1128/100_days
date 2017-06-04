@@ -9,3 +9,7 @@
     r: 3;
     fill-opacity: 0.4;
 }
+
+.data_focus {
+    fill: none;
+}

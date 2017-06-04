@@ -144,3 +144,10 @@ js_data <- mx %>%
   )
 
 cat(sprintf("var data = %s;", jsonlite::toJSON(js_data)), file = "~/Desktop/100_days/june2/data.js")
+
+ts_data <- js_data %>%
+  dlply(.(column, label), function(z) {
+    data.frame(row = z$row, value = z$value, column = z$column[1])
+  })
+names(ts_data) <- NULL
+cat(sprintf("var ts_data = %s;", jsonlite::toJSON(ts_data)), file = "~/Desktop/100_days/june2/ts_data.js")
