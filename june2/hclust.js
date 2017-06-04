@@ -1,7 +1,7 @@
 
 var root = d3.stratify()
-    .id(function(d) { return d.child; })
-    .parentId(function(d) { return d.id; })(tree);
+    .id(function(d) { return d.id; })
+    .parentId(function(d) { return d.parent; })(tree);
 
 function depths(root) {
   if (root.parent === null) {
@@ -20,7 +20,7 @@ function depths(root) {
 }
 
 var elem_height = 700;
-var elem_width = 1000;
+var elem_width = 1200;
 var elem = d3.select("#vis")
     .append("svg")
     .attrs({
@@ -40,31 +40,54 @@ var coords = {
   "x": root.descendants().map(function(d) { return d.data.x; }),
   "y": root.descendants().map(function(d) { return d.data.y; })
 };
+var rows = data.map(function(d) { return d.row; });
+rows = d3.set(rows).values();
+var fill_vals = data.map(function(d) { return d.value; });
 
 var scales = {
-  "x": d3.scaleLinear()
+  "tile_y": d3.scaleBand()
+    .domain(rows)
+    .range([elem_height / 5, elem_height]),
+  "tile_fill": d3.scaleLinear()
+    .domain(d3.extent(fill_vals))
+    .range(["#f8f8f8", "black"]),
+  "tree_x": d3.scaleLinear()
     .domain(d3.extent(coords.x))
     .range([0, elem_width]),
   "tree_y": d3.scaleLinear()
     .domain(d3.extent(coords.y))
-    .range([elem_height / 2, 0])
+    .range([elem_height / 5 - 10, 0])
 };
 
-elem.selectAll(".node")
-  .data(root.descendants()).enter()
+elem.selectAll(".hcnode")
+  .data(root.descendants(), function(d) { return d.id; }).enter()
   .append("circle")
   .attrs({
-    "class": "node",
-    "cx": function(d) { return scales.x(d.data.x); },
+    "class": "hcnode",
+    "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
   });
 
+var link_fun = d3.linkVertical()
+    .x(function(d) { return scales.tree_x(d.data.x); })
+    .y(function(d) { return scales.tree_y(d.data.y); });
+
 elem.selectAll(".link")
-  .data(root.links())
-  .enter().append("path")
+  .data(root.links()).enter()
+  .append("path")
   .attrs({
     "class": "link",
-    "d": d3.linkVertical()
-      .x(function(d) { return scales.x(d.data.x); })
-      .y(function(d) { return scales.tree_y(d.data.y); })
+    "d": link_fun
+  });
+
+elem.selectAll(".tile")
+  .data(data).enter()
+  .append("rect")
+  .attrs({
+    "class": "tile",
+    "x": function(d) { return scales.tree_x(d.x); },
+    "y": function(d) { return scales.tile_y(d.row); },
+    "width": 100,
+    "height": scales.tile_y.bandwidth(),
+    "fill": function(d) { return scales.tile_fill(d.value); }
   });
