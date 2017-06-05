@@ -42,24 +42,16 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
     });
 }
 
-function fill_fun(cur_labels, d, type) {
-  var indic;
-  if (type == "node") {
-    indic = cur_labels.indexOf(d.id);
-  } else if (type == "data_focus") {
-    indic = cur_labels.indexOf(d.column);
-  } else {
-    indic = cur_labels.indexOf(d.source.id);
-  }
-
-  if (indic != -1) {
-    return "red";
-  }
-  return "#555";
-};
-
 function id_fun(d) {
   return d.id;
+}
+
+function ts_id_fun(d) {
+  return d[0].column;
+}
+
+function tile_id_fun(d) {
+  return d.row + "-" + d.column
 }
 
 function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale, y_scale, fill_color) {
@@ -103,14 +95,6 @@ function selected_ids(elem, n_clusters) {
     );
   }
   return cur_labels;
-}
-
-function ts_id_fun(d) {
-  return d[0].column;
-}
-
-function tile_id_fun(d) {
-  return d.row + "-" + d.column
 }
 
 function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
