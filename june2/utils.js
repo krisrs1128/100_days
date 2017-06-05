@@ -62,15 +62,15 @@ function id_fun(d) {
   return d.id;
 }
 
-function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_scale, fill_color) {
+function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale, y_scale, fill_color) {
   elem.select("#subtree_" + cur_cluster)
     .selectAll(".hcnode")
-    .data(cur_tree.descendants(), id_fun).exit()
+    .data(cluster_data, id_fun).exit()
     .remove();
 
   elem.select("#subtree_" + cur_cluster)
     .selectAll(".hcnode")
-    .data(cur_tree.descendants(), id_fun).enter()
+    .data(cluster_data, id_fun).enter()
     .append("circle")
     .attrs({
       "class": "hcnode",
@@ -81,23 +81,28 @@ function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_s
       "cy": function(d) { return y_scale(d.data.y); }
     });
 
-  var cur_labels = [];
-  for (var k = 1; k < n_clusters; k++) {
-    cur_labels = cur_labels.concat(
-      elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
-    );
-  }
-
+  var highlight_ids = selected_ids(elem, n_clusters);
   elem.select("#subtree_0")
     .selectAll(".hcnode")
     .attrs({
       "fill-opacity": function(d) {
-        if (cur_labels.indexOf(d.id) == -1) {
+        if (highlight_ids.indexOf(d.id) == -1) {
           return 0.4;
         }
         return 0;
       }
     });
+}
+
+// ids selected by any cluster
+function selected_ids(elem, n_clusters) {
+  var cur_labels = [];
+  for (var k = 1; k <= n_clusters; k++) {
+    cur_labels = cur_labels.concat(
+      elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
+    );
+  }
+  return cur_labels;
 }
 
 function update_data_focus(elem, cur_tree, x_scale) {

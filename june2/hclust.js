@@ -59,11 +59,12 @@ elem.select("#subtree_0")
       scales.tree_x,
       scales.cluster_cols[cur_cluster]
     );
+
     update_tree_focus(
       elem,
+      cur_tree.descendants(),
       cur_cluster,
       opts.n_clusters,
-      cur_tree,
       scales.tree_x,
       scales.tree_y,
       scales.cluster_cols[cur_cluster]
