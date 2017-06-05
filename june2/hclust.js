@@ -3,52 +3,23 @@ var root = d3.stratify()
     .id(function(d) { return d.id; })
     .parentId(function(d) { return d.parent; })(tree);
 
-var elem_height = 350;
-var elem_width = 1200;
+var opts = scale_defaults({});
 var elem = d3.select("#vis")
     .append("svg")
     .attrs({
-      "width": elem_width,
-      "height": elem_height
+      "width": opts.elem_width,
+      "height": opts.elem_height
     });
 
 elem.append("rect")
   .attrs({
     "fill": "#F8F8F8",
-    "width": elem_width,
-    "height": elem_height
+    "width": opts.elem_width,
+    "height": opts.elem_height
   });
 
-// Build scales
+var scales = scales_dictionary(tree, data, opts);
 d3.cluster()(root);
-var coords = {
-  "x": root.descendants().map(function(d) { return d.data.x; }),
-  "y": root.descendants().map(function(d) { return d.data.y; })
-};
-var rows = data.map(function(d) { return d.row; });
-rows = d3.set(rows).values();
-var fill_vals = data.map(function(d) { return d.value; });
-
-var scales = {
-  "tile_y": d3.scaleBand()
-    .domain(rows)
-    .range([elem_height / 5, elem_height]),
-  "tile_fill": d3.scaleLinear()
-    .domain(d3.extent(fill_vals))
-    .range(["#f8f8f8", "black"]),
-  "tree_x": d3.scaleLinear()
-    .domain(d3.extent(coords.x))
-    .range([0, 0.6 * elem_width]),
-  "tree_y": d3.scaleLinear()
-    .domain(d3.extent(coords.y))
-    .range([elem_height / 5 - 10, 0]),
-  "centroid_x": d3.scaleBand()
-    .domain(rows)
-    .range([0.61 * elem_width, elem_width]),
-  "centroid_y": d3.scaleLinear()
-    .domain(d3.extent(fill_vals))
-    .range([elem_height, 0])
-};
 
 // Draw the tree
 elem.selectAll(".hcnode")

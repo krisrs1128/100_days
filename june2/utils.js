@@ -93,3 +93,52 @@ function update_data_focus(elem, cur_tree, x_scale) {
       }
     });
 }
+
+function scale_defaults(opts) {
+  var default_opts = {
+    "elem_height": 350,
+    "elem_width": 1200,
+    "tree_y_prop": 0.2,
+    "tree_x_prop": 0.8
+  };
+
+  var keys = Object.keys(default_opts);
+  for (var i = 0; i < keys.length; i++) {
+    if (Object.keys(opts).indexOf(keys[i]) == -1) {
+      opts[keys[i]] = default_opts[keys[i]];
+    }
+  }
+  return opts;
+}
+
+function scales_dictionary(tree, data, opts) {
+  var coords = {
+    "x": tree.map(function(d) { return d.x; }),
+    "y": tree.map(function(d) { return d.y; })
+  };
+  var rows = data.map(function(d) { return d.row; });
+  rows = d3.set(rows).values();
+  var fill_vals = data.map(function(d) { return d.value; });
+
+  return {
+    "tile_y": d3.scaleBand()
+      .domain(rows)
+      .range([opts.tree_y_prop * opts.elem_height, opts.elem_height]),
+    "tile_fill": d3.scaleLinear()
+      .domain(d3.extent(fill_vals))
+      .range(["#f8f8f8", "black"]),
+    "tree_x": d3.scaleLinear()
+      .domain(d3.extent(coords.x))
+      .range([0, opts.tree_x_prop * opts.elem_width]),
+    "tree_y": d3.scaleLinear()
+      .domain(d3.extent(coords.y))
+      .range([opts.tree_y_prop * opts.elem_height - 10, 0]),
+    "centroid_x": d3.scaleBand()
+      .domain(rows)
+      .range([opts.tree_x_prop * opts.elem_width + 10, opts.elem_width]),
+    "centroid_y": d3.scaleLinear()
+      .domain(d3.extent(fill_vals))
+      .range([opts.elem_height, 0])
+  };
+
+}
