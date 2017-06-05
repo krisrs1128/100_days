@@ -22,9 +22,9 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
   var x_extent = d3.extent(cur_x);
 
   var focus_rect = focus_elem.select("rect");
-  var n_rects = focus_rect.nodes().length
-  if (n_rects == 0) {
-    focus_elem.append("rect")
+  var n_rects = focus_rect.nodes().length;
+  if (n_rects === 0) {
+    focus_elem.append("rect");
   }
 
   focus_rect = focus_elem.selectAll("rect")
@@ -62,10 +62,6 @@ function id_fun(d) {
 
 function ts_id_fun(d) {
   return d[0].column;
-}
-
-function tile_id_fun(d) {
-  return d.row + "-" + d.column
 }
 
 function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale, y_scale, fill_color) {
