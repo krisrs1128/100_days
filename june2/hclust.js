@@ -45,7 +45,7 @@ elem.select("#subtree_0")
   .append("circle")
   .attrs({
     "class": "hcnode",
-    "fill": "#555",
+    "fill-opacity": 0,
     "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
   })

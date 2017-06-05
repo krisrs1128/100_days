@@ -38,6 +38,7 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
       "width": x_scale(x_extent[1]) - x_scale(x_extent[0]) + bandwidth,
       "height": 4 / 5 * height,
       "stroke": stroke_color,
+      "stroke-opacity": 0.7,
       "fill": "none"
     });
 }
@@ -67,6 +68,7 @@ function update_tree_focus(cluster_elem, base_elem, cur_tree, x_scale, y_scale, 
 
   cluster_elem.selectAll(".hcnode")
     .data(cur_tree.descendants(), id_fun).exit()
+    .transition("fadeaway")
     .remove();
 
   cluster_elem.selectAll(".hcnode")
@@ -77,15 +79,9 @@ function update_tree_focus(cluster_elem, base_elem, cur_tree, x_scale, y_scale, 
       "fill": fill_color,
       "cx": function(d) { return x_scale(d.data.x); },
       "cy": function(d) { return y_scale(d.data.y); },
-      "opacity": 0
+      "fill-opacity": 0.4
     });
 
-  cluster_elem.selectAll(".hcnode")
-    .transition()
-    .duration(500)
-    .attrs({
-      "opacity": 0.6
-    })
 }
 
 function update_data_focus(elem, cur_tree, x_scale) {
