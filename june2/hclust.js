@@ -76,6 +76,19 @@ elem.select("#subtree_0")
     // );
   });
 
+elem.select("#subtree_" + opts.n_clusters)
+  .selectAll(".hcnode")
+  .data(root.descendants(), function(d) { return d.id; }).enter()
+  .append("circle")
+  .attrs({
+    "class": "hcnode",
+    "r": 2,
+    "fill": "#F8F8F8",
+    "fill-opacity": 1,
+    "cx": function(d) { return scales.tree_x(d.data.x); },
+    "cy": function(d) { return scales.tree_y(d.data.y); }
+  });
+
 var link_fun = d3.linkVertical()
     .x(function(d) { return scales.tree_x(d.data.x); })
     .y(function(d) { return scales.tree_y(d.data.y); });

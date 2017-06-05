@@ -69,7 +69,7 @@ function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_s
     .remove();
 
   var cur_labels = cur_tree.descendants().map(id_fun);
-  for (var k = 1; k <= n_clusters; k++) {
+  for (var k = 1; k < n_clusters; k++) {
     cur_labels = cur_labels.concat(
       elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
     );
