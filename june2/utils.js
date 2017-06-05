@@ -27,8 +27,8 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
     focus_elem.append("rect")
   }
 
-  focus_rect = focus_elem.selectAll("rect");
-  focus_rect.transition()
+  focus_rect = focus_elem.selectAll("rect")
+    .transition()
     .duration(500)
     .attrs({
       "class": "hm_focus",
@@ -109,10 +109,12 @@ function ts_id_fun(d) {
   return d[0].column;
 }
 
+function tile_id_fun(d) {
+  return d.row + "-" + d.column
+}
+
 function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
   var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
-  console.log(cluster_data)
-
   elem.select("#time_series_" + cur_cluster)
     .selectAll(".highlighted_series")
     .data(cluster_data, ts_id_fun).exit()

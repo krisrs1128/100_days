@@ -59,7 +59,6 @@ elem.select("#subtree_0")
       scales.tree_x,
       scales.cluster_cols[cur_cluster]
     );
-
     update_tree_focus(
       elem,
       cur_tree.descendants(),
@@ -96,7 +95,7 @@ elem.select("#links")
 var bandwidth = scales.tree_x.range()[1] / (scales.tree_x.domain()[1] - scales.tree_x.domain()[0]);
 elem.select("#tiles")
   .selectAll(".tile")
-  .data(data).enter()
+  .data(data, tile_id_fun).enter()
   .append("rect")
   .attrs({
     "class": "tile",

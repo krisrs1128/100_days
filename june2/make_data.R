@@ -1,5 +1,6 @@
 
 library("ape")
+library("plyr")
 library("tidyverse")
 library("proxy")
 library("phyloseq")
@@ -63,7 +64,7 @@ join_sources <- function(x, taxa, samples, dendro, h = 0.5) {
 ## ---- data ----
 download.file("https://github.com/krisrs1128/treelapse/raw/master/data/abt.rda", "abt.rda")
 abt <- get(load("abt.rda")) %>%
-  filter_taxa(function(x) { var(x) > 1000 }, TRUE)
+  filter_taxa(function(x) { var(x) > 5 }, TRUE)
 
 x <- t(get_taxa(abt))
 
@@ -113,7 +114,6 @@ node_data <- data_frame(
   x = phy_data$yy
 )
 
-library("plyr")
 phy_df <- as_data_frame(phy$edge) %>%
   rename(parent = V1, id = V2) %>%
   left_join(node_data)
