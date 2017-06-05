@@ -105,30 +105,38 @@ function selected_ids(elem, n_clusters) {
   return cur_labels;
 }
 
-function update_data_focus(elem, cur_tree, x_scale) {
-  var cur_labels = cur_tree.leaves().map(function(d) {return d.id;});
+function ts_id_fun(d) {
+  return d[0].column;
+}
 
-  elem.selectAll(".data_focus")
-    .transition()
-    .duration(500)
+function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, n_clusters, stroke_color) {
+  var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
+  console.log(cluster_data)
+
+  elem.select("#time_series_" + cur_cluster)
+    .selectAll(".highlighted_series")
+    .data(cluster_data, ts_id_fun).exit()
+    .remove();
+
+  elem.select("#time_series_" + cur_cluster)
+    .selectAll(".highlighted_series")
+    .data(cluster_data, ts_id_fun).enter()
+    .append("path")
     .attrs({
-      "stroke": function(d) {
-        if (cur_labels.indexOf(d[0].column) == -1) {
-          return "#555";
-        }
-        return "red";
-      },
+      "stroke": stroke_color,
+      "class": "highlighted_series",
+      "d": line
+    });
+
+  var highlight_ids = selected_ids(elem, n_clusters);
+  elem.select("#time_series_0")
+    .selectAll(".background_series")
+    .attrs({
       "stroke-opacity": function(d) {
-        if (cur_labels.indexOf(d[0].column) == -1) {
-          return 0.05;
+        if (highlight_ids.indexOf(d[0].column) == -1) {
+          return 0.1;
         }
-        return 0.1;
-      },
-      "stroke-width": function(d) {
-        if (cur_labels.indexOf(d[0].column) == -1) {
-          return 0.2;
-        }
-        return 3;
+       return 0;
       }
     });
 }

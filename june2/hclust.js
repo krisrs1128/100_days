@@ -41,7 +41,7 @@ d3.cluster()(root);
 // Draw the tree
 elem.select("#subtree_0")
   .selectAll(".hcnode")
-  .data(root.descendants(), function(d) { return d.id; }).enter()
+  .data(root.descendants(), id_fun).enter()
   .append("circle")
   .attrs({
     "class": "hcnode",
@@ -69,12 +69,14 @@ elem.select("#subtree_0")
       scales.tree_y,
       scales.cluster_cols[cur_cluster]
     );
-    // update_data_focus(
-    //   elem.select("#time_series_" + k),
-    //   elem.select("#time_series_0"),
-    //   cur_tree,
-    //   scales.tree_x
-    // );
+    update_ts_focus(
+      elem,
+      ts_data,
+      cur_tree.leaves().map(id_fun),
+      cur_cluster,
+      opts.n_clusters,
+      scales.cluster_cols[cur_cluster]
+    );
   });
 
 var link_fun = d3.linkVertical()
@@ -115,14 +117,24 @@ var line = d3.line()
     .y(function(d) {
       return scales.centroid_y(d.value); });
 
-// draw the centroids
-elem.selectAll(".data_focus")
-  .data(ts_data).enter()
+// // draw the centroids
+// elem.selectAll(".data_focus")
+//   .data(ts_data).enter()
+//   .append("path")
+//   .attrs({
+//     "class": "data_focus",
+//     "stroke-opacity": 0.2,
+//     "stroke-width": 0.2,
+//     "stroke": "#555"
+//   })
+//   .attr("d", line);
+
+elem.select("#time_series_0")
+  .selectAll(".background_series")
+  .data(ts_data, ts_id_fun).enter()
   .append("path")
   .attrs({
-    "class": "data_focus",
-    "stroke-opacity": 0.2,
-    "stroke-width": 0.2,
-    "stroke": "#555"
-  })
-  .attr("d", line);
+    "class": "background_series",
+    "stroke-opacity": 0.1,
+    "d": line
+  });

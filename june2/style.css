@@ -8,10 +8,18 @@
 .hcnode {
 }
 
-.data_focus {
-    fill: none;
-}
-
 .hm_focus {
     stroke-width: 1;
+}
+
+.background_series {
+    stroke-width: 0.2;
+    fill: none;
+    stroke: #555;
+}
+
+.highlighted_series {
+    stroke-opacity: 0.6;
+    stroke-width: 1;
+    fill: none;
 }
