@@ -75,6 +75,10 @@ elem.select("#subtree_0")
       cur_cluster,
       scales.cluster_cols[cur_cluster]
     );
+    update_heatmap(
+      elem,
+      opts.n_clusters
+    );
   });
 
 var link_fun = d3.linkVertical()
