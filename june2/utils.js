@@ -67,7 +67,7 @@ function update_tree_focus(elem, cur_tree, x_scale) {
 }
 
 function update_data_focus(elem, cur_tree, x_scale) {
-  var cur_labels = cur_tree.descendants().map(function(d) {return d.id;});
+  var cur_labels = cur_tree.leaves().map(function(d) {return d.id;});
 
   elem.selectAll(".data_focus")
     .transition()
