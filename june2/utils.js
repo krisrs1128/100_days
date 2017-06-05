@@ -28,7 +28,6 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
   }
 
   focus_rect = focus_elem.selectAll("rect");
-  console.log(focus_rect);
   focus_rect.transition()
     .duration(500)
     .attrs({
@@ -63,25 +62,41 @@ function id_fun(d) {
   return d.id;
 }
 
-function update_tree_focus(cluster_elem, base_elem, cur_tree, x_scale, y_scale, fill_color) {
-  var cur_labels = cur_tree.descendants().map(id_fun);
-
-  cluster_elem.selectAll(".hcnode")
+function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_scale, fill_color) {
+  elem.select("#subtree_" + cur_cluster)
+    .selectAll(".hcnode")
     .data(cur_tree.descendants(), id_fun).exit()
-    .transition("fadeaway")
     .remove();
 
-  cluster_elem.selectAll(".hcnode")
+  var cur_labels = cur_tree.descendants().map(id_fun);
+  for (var k = 1; k <= n_clusters; k++) {
+    cur_labels = cur_labels.concat(
+      elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
+    );
+  }
+  elem.select("#subtree_" + cur_cluster)
+    .selectAll(".hcnode")
     .data(cur_tree.descendants(), id_fun).enter()
     .append("circle")
     .attrs({
       "class": "hcnode",
+      "r": 2,
       "fill": fill_color,
+      "fill-opacity": 0.4,
       "cx": function(d) { return x_scale(d.data.x); },
-      "cy": function(d) { return y_scale(d.data.y); },
-      "fill-opacity": 0.4
+      "cy": function(d) { return y_scale(d.data.y); }
     });
 
+  elem.select("#subtree_0")
+    .selectAll(".hcnode")
+    .attrs({
+      "fill-opacity": function(d) {
+        if (cur_labels.indexOf(d.id) == -1) {
+          return 0.4;
+        }
+        return 0;
+      }
+    });
 }
 
 function update_data_focus(elem, cur_tree, x_scale) {

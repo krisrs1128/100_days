@@ -20,7 +20,7 @@ elem.append("rect")
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
 var cur_cluster = 1;
-var group_labels = ["tiles"];
+var group_labels = ["tiles", "links"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -45,7 +45,9 @@ elem.select("#subtree_0")
   .append("circle")
   .attrs({
     "class": "hcnode",
-    "fill-opacity": 0,
+    "r": 2,
+    "fill": "#555",
+    "fill-opacity": 0.4,
     "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
   })
@@ -58,8 +60,9 @@ elem.select("#subtree_0")
       scales.cluster_cols[cur_cluster]
     );
     update_tree_focus(
-      elem.select("#subtree_" + cur_cluster),
-      elem.select("#subtree_0"),
+      elem,
+      cur_cluster,
+      opts.n_clusters,
       cur_tree,
       scales.tree_x,
       scales.tree_y,
@@ -77,7 +80,8 @@ var link_fun = d3.linkVertical()
     .x(function(d) { return scales.tree_x(d.data.x); })
     .y(function(d) { return scales.tree_y(d.data.y); });
 
-elem.selectAll(".link")
+elem.select("#links")
+  .selectAll(".link")
   .data(root.links()).enter()
   .append("path")
   .attrs({
