@@ -68,12 +68,6 @@ function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_s
     .data(cur_tree.descendants(), id_fun).exit()
     .remove();
 
-  var cur_labels = cur_tree.descendants().map(id_fun);
-  for (var k = 1; k < n_clusters; k++) {
-    cur_labels = cur_labels.concat(
-      elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
-    );
-  }
   elem.select("#subtree_" + cur_cluster)
     .selectAll(".hcnode")
     .data(cur_tree.descendants(), id_fun).enter()
@@ -86,6 +80,13 @@ function update_tree_focus(elem, cur_cluster, n_clusters, cur_tree, x_scale, y_s
       "cx": function(d) { return x_scale(d.data.x); },
       "cy": function(d) { return y_scale(d.data.y); }
     });
+
+  var cur_labels = [];
+  for (var k = 1; k < n_clusters; k++) {
+    cur_labels = cur_labels.concat(
+      elem.select("#subtree_" + k).selectAll(".hcnode").data().map(id_fun)
+    );
+  }
 
   elem.select("#subtree_0")
     .selectAll(".hcnode")
