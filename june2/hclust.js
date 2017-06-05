@@ -39,7 +39,8 @@ var scales = scales_dictionary(tree, data, opts);
 d3.cluster()(root);
 
 // Draw the tree
-elem.selectAll(".hcnode")
+elem.select("#subtree_0")
+  .selectAll(".hcnode")
   .data(root.descendants(), function(d) { return d.id; }).enter()
   .append("circle")
   .attrs({
@@ -56,12 +57,14 @@ elem.selectAll(".hcnode")
       scales.tree_x,
       scales.cluster_cols[cur_cluster]
     );
-    // update_tree_focus(
-    //   elem.select("#subtree_" + k),
-    //   elem.select("#subtree_0"),
-    //   cur_tree,
-    //   scales.tree_x
-    // );
+    update_tree_focus(
+      elem.select("#subtree_" + cur_cluster),
+      elem.select("#subtree_0"),
+      cur_tree,
+      scales.tree_x,
+      scales.tree_y,
+      scales.cluster_cols[cur_cluster]
+    );
     // update_data_focus(
     //   elem.select("#time_series_" + k),
     //   elem.select("#time_series_0"),

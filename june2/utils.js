@@ -42,7 +42,7 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
     });
 }
 
-var fill_fun = function(cur_labels, d, type) {
+function fill_fun(cur_labels, d, type) {
   var indic;
   if (type == "node") {
     indic = cur_labels.indexOf(d.id);
@@ -58,21 +58,34 @@ var fill_fun = function(cur_labels, d, type) {
   return "#555";
 };
 
-function update_tree_focus(elem, cur_tree, x_scale) {
-  var cur_labels = cur_tree.descendants().map(function(d) {return d.id;});
-  elem.selectAll(".hcnode")
-    .transition()
-    .duration(500)
+function id_fun(d) {
+  return d.id;
+}
+
+function update_tree_focus(cluster_elem, base_elem, cur_tree, x_scale, y_scale, fill_color) {
+  var cur_labels = cur_tree.descendants().map(id_fun);
+
+  cluster_elem.selectAll(".hcnode")
+    .data(cur_tree.descendants(), id_fun).exit()
+    .remove();
+
+  cluster_elem.selectAll(".hcnode")
+    .data(cur_tree.descendants(), id_fun).enter()
+    .append("circle")
     .attrs({
-      "fill": function(d) { return fill_fun(cur_labels, d, "node"); }
+      "class": "hcnode",
+      "fill": fill_color,
+      "cx": function(d) { return x_scale(d.data.x); },
+      "cy": function(d) { return y_scale(d.data.y); },
+      "opacity": 0
     });
 
-  elem.selectAll(".link")
+  cluster_elem.selectAll(".hcnode")
     .transition()
     .duration(500)
     .attrs({
-      "stroke": function(d) { return fill_fun(cur_labels, d, "link"); }
-    });
+      "opacity": 0.6
+    })
 }
 
 function update_data_focus(elem, cur_tree, x_scale) {
