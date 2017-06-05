@@ -20,7 +20,7 @@ elem.append("rect")
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
 var cur_cluster = 1;
-var group_labels = ["tiles", "links"];
+var group_labels = ["tiles", "tile_cover", "links"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -104,6 +104,19 @@ elem.select("#tiles")
     "width": bandwidth,
     "height": scales.tile_y.bandwidth(),
     "fill": function(d) { return scales.tile_fill(d.value); }
+  });
+
+// Draw shades / covers on the heatmap
+elem.select("#tile_cover")
+  .selectAll(".tile_cover")
+  .data(ts_id, ts_id_fun).enter()
+  .append("rect")
+  .attrs({
+    "class": "tile_cover",
+    "x": function(d) { return scales.tree_x(d[0].x); },
+    "y": scales.tree_y.domain()[0],
+    "height": scales.tree_y.domain()[1] - scales.tree_y.domain()[0],
+    "fill-opacity": 0
   });
 
 elem.append("rect")

@@ -12,6 +12,10 @@
     stroke-width: 1;
 }
 
+.tile_cover {
+    fill: #555;
+}
+
 .highlighted_series {
     stroke-opacity: 0.1;
     stroke-width: 0.1;

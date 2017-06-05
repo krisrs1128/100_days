@@ -42,6 +42,20 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
     });
 }
 
+function update_heatmap(elem, n_clusters) {
+  var highlighted_ids = selected_ids(elem, n_clusters);
+  elem.selectAll("#tile_cover")
+    .selectAll(".tile_cover")
+    .attrs({
+      "fill-opacity": function(d)  {
+        if (highlighted_ids.indexOf(d.id) == -1) {
+          return 0;
+        }
+        return 0.4;
+      }
+    });
+}
+
 function id_fun(d) {
   return d.id;
 }
@@ -136,11 +150,11 @@ function elemwise_mean(x_array) {
   }
 
   var means = {};
-  for (var i = 0; i < keys.length; i++) {
+  for (var j = 0; j < keys.length; j++) {
     var filter_data = x_concat
-        .filter(function(d) { return d.row == keys[i]; })
+        .filter(function(d) { return d.row == keys[j]; })
         .map(function(d) { return d.value; });
-    means[keys[i]] = d3.mean(filter_data);
+    means[keys[j]] = d3.mean(filter_data);
   }
   return means;
 }
