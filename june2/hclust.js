@@ -74,7 +74,6 @@ elem.select("#subtree_0")
       ts_data,
       cur_tree.leaves().map(id_fun),
       cur_cluster,
-      opts.n_clusters,
       scales.cluster_cols[cur_cluster]
     );
   });
@@ -116,25 +115,3 @@ var line = d3.line()
       return scales.centroid_x(d.row); })
     .y(function(d) {
       return scales.centroid_y(d.value); });
-
-// // draw the centroids
-// elem.selectAll(".data_focus")
-//   .data(ts_data).enter()
-//   .append("path")
-//   .attrs({
-//     "class": "data_focus",
-//     "stroke-opacity": 0.2,
-//     "stroke-width": 0.2,
-//     "stroke": "#555"
-//   })
-//   .attr("d", line);
-
-elem.select("#time_series_0")
-  .selectAll(".background_series")
-  .data(ts_data, ts_id_fun).enter()
-  .append("path")
-  .attrs({
-    "class": "background_series",
-    "stroke-opacity": 0.1,
-    "d": line
-  });

@@ -109,7 +109,7 @@ function ts_id_fun(d) {
   return d[0].column;
 }
 
-function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, n_clusters, stroke_color) {
+function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
   var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
   console.log(cluster_data)
 
@@ -126,18 +126,6 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, n_clusters, stroke
       "stroke": stroke_color,
       "class": "highlighted_series",
       "d": line
-    });
-
-  var highlight_ids = selected_ids(elem, n_clusters);
-  elem.select("#time_series_0")
-    .selectAll(".background_series")
-    .attrs({
-      "stroke-opacity": function(d) {
-        if (highlight_ids.indexOf(d[0].column) == -1) {
-          return 0.1;
-        }
-       return 0;
-      }
     });
 }
 
