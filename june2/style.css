@@ -12,14 +12,14 @@
     stroke-width: 1;
 }
 
-.background_series {
-    stroke-width: 0.2;
+.highlighted_series {
+    stroke-opacity: 0.1;
+    stroke-width: 0.1;
     fill: none;
-    stroke: #555;
 }
 
-.highlighted_series {
-    stroke-opacity: 0.6;
-    stroke-width: 1;
+.centroid {
+    stroke-opacity: 0.9;
+    stroke-width: 1.2;
     fill: none;
 }

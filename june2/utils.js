@@ -113,6 +113,36 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
       "class": "highlighted_series",
       "d": line
     });
+
+  var means = elemwise_mean(cluster_data);
+  elem.select("#centroids_" + cur_cluster)
+    .selectAll(".centroid")
+    .data(means, function(d) { return cur_cluster; }).enter()
+    .append("path")
+    .attrs({
+      "stroke": stroke_color,
+      "class": "centroid",
+      "d": line
+    });
+}
+
+function elemwise_mean(x_array) {
+  var keys = [];
+  var x_concat = [];
+  for (var i = 0; i < x_array.length; i++) {
+    keys = keys.concat(x_array[i].map(function(d) { return d.row; }));
+    x_concat = x_concat.concat(x_array[i]);
+    keys = d3.set(keys).values();
+  }
+
+  var means = {};
+  for (var i = 0; i < keys.length; i++) {
+    var filter_data = x_concat
+        .filter(function(d) { return d.row == keys[i]; })
+        .map(function(d) { return d.value; });
+    means[keys[i]] = d3.mean(filter_data);
+  }
+  return means;
 }
 
 function parameter_defaults(opts) {
