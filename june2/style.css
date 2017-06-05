@@ -13,3 +13,7 @@
 .data_focus {
     fill: none;
 }
+
+.hm_focus {
+    stroke-width: 1;
+}

@@ -13,22 +13,31 @@ function subtree(hierarchy, query_id) {
   }
 }
 
-function update_heatmap_focus(elem, cur_tree, x_scale) {
-  var cur_x = cur_tree.descendants()
+function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
+  var cur_x = cur_tree.leaves()
       .map(function(d) { return d.data.x; });
 
   var bandwidth = x_scale.range()[1] / (x_scale.domain()[1] - x_scale.domain()[0]);
   var height = elem.attr("height");
   var x_extent = d3.extent(cur_x);
-  elem.selectAll(".hm_focus")
-    .transition()
+
+  var focus_rect = focus_elem.select("rect");
+  var n_rects = focus_rect.nodes().length
+  if (n_rects == 0) {
+    focus_elem.append("rect")
+  }
+
+  focus_rect = focus_elem.selectAll("rect");
+  console.log(focus_rect);
+  focus_rect.transition()
     .duration(500)
     .attrs({
+      "class": "hm_focus",
       "x": x_scale(x_extent[0]),
       "y": height / 5,
       "width": x_scale(x_extent[1]) - x_scale(x_extent[0]) + bandwidth,
       "height": 4 / 5 * height,
-      "stroke": "red",
+      "stroke": stroke_color,
       "fill": "none"
     });
 }
@@ -94,8 +103,9 @@ function update_data_focus(elem, cur_tree, x_scale) {
     });
 }
 
-function scale_defaults(opts) {
+function parameter_defaults(opts) {
   var default_opts = {
+    "n_clusters": 3,
     "elem_height": 350,
     "elem_width": 1200,
     "tree_y_prop": 0.2,
@@ -138,7 +148,8 @@ function scales_dictionary(tree, data, opts) {
       .range([opts.tree_x_prop * opts.elem_width + 10, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
-      .range([opts.elem_height, 0])
+      .range([opts.elem_height, 0]),
+    "cluster_cols": ["#555", "orange", "steelblue", "plum"]
   };
 
 }
