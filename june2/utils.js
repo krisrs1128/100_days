@@ -44,11 +44,11 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
 
 function update_heatmap(elem, n_clusters) {
   var highlighted_ids = selected_ids(elem, n_clusters);
-  elem.selectAll("#tile_cover")
+  elem.select("#tile_cover")
     .selectAll(".tile_cover")
     .attrs({
       "fill-opacity": function(d)  {
-        if (highlighted_ids.indexOf(d.id) == -1) {
+        if (highlighted_ids.indexOf(d.column) != -1) {
           return 0;
         }
         return 0.4;
@@ -62,6 +62,10 @@ function id_fun(d) {
 
 function ts_id_fun(d) {
   return d[0].column;
+}
+
+function tile_id_fun(d) {
+  return d.column + "-" + d.row;
 }
 
 function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale, y_scale, fill_color) {
@@ -119,15 +123,19 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
     .data(cluster_data, ts_id_fun).enter()
     .append("path")
     .attrs({
-      "stroke": stroke_color,
       "class": "highlighted_series",
+      "stroke": stroke_color,
       "d": line
     });
+
+  elem.select("#centroids_" + cur_cluster)
+    .selectAll(".centroid")
+    .remove();
 
   var means = elemwise_mean(cluster_data);
   elem.select("#centroids_" + cur_cluster)
     .selectAll(".centroid")
-    .data(means, function(d) { return cur_cluster; }).enter()
+    .data([means]).enter()
     .append("path")
     .attrs({
       "stroke": stroke_color,
@@ -145,12 +153,12 @@ function elemwise_mean(x_array) {
     keys = d3.set(keys).values();
   }
 
-  var means = {};
+  var means = [];
   for (var j = 0; j < keys.length; j++) {
     var filter_data = x_concat
         .filter(function(d) { return d.row == keys[j]; })
         .map(function(d) { return d.value; });
-    means[keys[j]] = d3.mean(filter_data);
+    means.push({"row": keys[j], "value": d3.mean(filter_data)});
   }
   return means;
 }
@@ -201,7 +209,7 @@ function scales_dictionary(tree, data, opts) {
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.elem_height, 0]),
-    "cluster_cols": ["#555", "orange", "steelblue", "plum"]
+    "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854']
   };
 
 }

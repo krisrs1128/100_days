@@ -111,15 +111,17 @@ elem.select("#tiles")
   });
 
 // Draw shades / covers on the heatmap
+var init_level = data[0].row;
 elem.select("#tile_cover")
   .selectAll(".tile_cover")
-  .data(ts_id, ts_id_fun).enter()
+  .data(data.filter(function(d) { return d.row == init_level;}), function(d) { return d.x; }).enter()
   .append("rect")
   .attrs({
     "class": "tile_cover",
-    "x": function(d) { return scales.tree_x(d[0].x); },
-    "y": scales.tree_y.domain()[0],
-    "height": scales.tree_y.domain()[1] - scales.tree_y.domain()[0],
+    "x": function(d) { return scales.tree_x(d.x); },
+    "width": bandwidth,
+    "y": scales.tile_y.range()[0],
+    "height": scales.tile_y.range()[1] - scales.tile_y.range()[0],
     "fill-opacity": 0
   });
 
