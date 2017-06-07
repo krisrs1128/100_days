@@ -64,7 +64,7 @@ join_sources <- function(x, taxa, samples, dendro, h = 0.5) {
 ## ---- data ----
 download.file("https://github.com/krisrs1128/treelapse/raw/master/data/abt.rda", "abt.rda")
 abt <- get(load("abt.rda")) %>%
-  filter_taxa(function(x) { var(x) > 5 }, TRUE)
+  filter_taxa(function(x) { var(x) > 1 }, TRUE)
 
 x <- t(get_taxa(abt))
 
@@ -131,11 +131,14 @@ cat(sprintf("var tree = %s;", jsonlite::toJSON(phy_df)), file = "~/Desktop/100_d
 js_data <- mx %>%
   ungroup() %>%
   arrange(leaf_ix) %>%
-  dplyr::select(sample, rsv, label, scaled) %>%
+  dplyr::select(sample, ind, time, rsv, label, scaled) %>%
   rename(
     column = rsv,
     row = sample,
-    value = scaled
+    value = scaled,
+    facet_x = time,
+    facet = ind,
+    group = label
   ) %>%
   left_join(
     phy_df %>%
@@ -146,8 +149,8 @@ js_data <- mx %>%
 cat(sprintf("var data = %s;", jsonlite::toJSON(js_data)), file = "~/Desktop/100_days/june2/data.js")
 
 ts_data <- js_data %>%
-  dlply(.(column, label), function(z) {
-    data.frame(row = z$row, value = z$value, column = z$column[1])
+  dlply(.(facet, column, group), function(z) {
+    z
   })
 names(ts_data) <- NULL
 cat(sprintf("var ts_data = %s;", jsonlite::toJSON(ts_data)), file = "~/Desktop/100_days/june2/ts_data.js")

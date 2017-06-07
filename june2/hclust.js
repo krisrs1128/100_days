@@ -130,6 +130,8 @@ elem.append("rect")
 
 var line = d3.line()
     .x(function(d) {
-      return scales.centroid_x(d.row); })
+      return scales.centroid_x(d.facet_x);
+    })
     .y(function(d) {
-      return scales.centroid_y(d.value); });
+      return scales.facet_offset(d.facet) + scales.centroid_y(d.value);
+    });

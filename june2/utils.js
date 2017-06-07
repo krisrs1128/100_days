@@ -135,7 +135,7 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
   var means = elemwise_mean(cluster_data);
   elem.select("#centroids_" + cur_cluster)
     .selectAll(".centroid")
-    .data([means]).enter()
+    .data(means).enter()
     .append("path")
     .attrs({
       "stroke": stroke_color,
@@ -145,20 +145,33 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
 }
 
 function elemwise_mean(x_array) {
+  var facets = [];
   var keys = [];
   var x_concat = [];
   for (var i = 0; i < x_array.length; i++) {
-    keys = keys.concat(x_array[i].map(function(d) { return d.row; }));
+    facets = facets.concat(extract_unique(x_array[i], "facet"));
+    keys = keys.concat(extract_unique(x_array[i], "facet_x"));
     x_concat = x_concat.concat(x_array[i]);
-    keys = d3.set(keys).values();
   }
+  facets = d3.set(facets).values();
+  keys = d3.set(keys).values();
 
   var means = [];
-  for (var j = 0; j < keys.length; j++) {
-    var filter_data = x_concat
-        .filter(function(d) { return d.row == keys[j]; })
-        .map(function(d) { return d.value; });
-    means.push({"row": keys[j], "value": d3.mean(filter_data)});
+  for (var j = 0; j < facets.length; j++) {
+    var facet_mean = [];
+    for (var k = 0; k < keys.length; k++) {
+      var filter_data = x_concat
+          .filter(function(d) { return d.facet == facets[j] && d.facet_x == keys[k]; })
+          .map(function(d) { return d.value; });
+      if (filter_data.length > 0) {
+        facet_mean.push({
+          "facet": facets[j],
+          "facet_x": parseFloat(keys[k]),
+          "value": d3.mean(filter_data)
+        });
+      }
+    }
+    means.push(facet_mean);
   }
   return means;
 }
@@ -181,18 +194,23 @@ function parameter_defaults(opts) {
   return opts;
 }
 
+function extract_unique(x, key) {
+  var u = x.map(function(d) { return d[key]; })
+  return d3.set(u).values();
+}
+
 function scales_dictionary(tree, data, opts) {
   var coords = {
     "x": tree.map(function(d) { return d.x; }),
     "y": tree.map(function(d) { return d.y; })
   };
-  var rows = data.map(function(d) { return d.row; });
-  rows = d3.set(rows).values();
+  var facets = extract_unique(data, "facet");
   var fill_vals = data.map(function(d) { return d.value; });
+  var facet_x = extract_unique(data, "facet_x").map(parseFloat);
 
   return {
     "tile_y": d3.scaleBand()
-      .domain(rows)
+      .domain(extract_unique(data, "row"))
       .range([opts.tree_y_prop * opts.elem_height, opts.elem_height]),
     "tile_fill": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
@@ -203,13 +221,16 @@ function scales_dictionary(tree, data, opts) {
     "tree_y": d3.scaleLinear()
       .domain(d3.extent(coords.y))
       .range([opts.tree_y_prop * opts.elem_height - 10, 0]),
-    "centroid_x": d3.scaleBand()
-      .domain(rows)
+    "centroid_x": d3.scaleLinear()
+      .domain(d3.extent(facet_x))
       .range([opts.tree_x_prop * opts.elem_width + 10, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
-      .range([opts.elem_height, 0]),
-    "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854']
+      .range([opts.elem_height / facets.length, 0]),
+    "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
+    "facet_offset": d3.scaleBand()
+      .domain(facets)
+      .range([0, opts.elem_height])
   };
 
 }
