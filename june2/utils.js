@@ -111,7 +111,7 @@ function selected_ids(elem, n_clusters) {
   return cur_labels;
 }
 
-function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
+function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, facets, facets_x) {
   var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
   elem.select("#time_series_" + cur_cluster)
     .selectAll(".highlighted_series")
@@ -132,7 +132,7 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
     .selectAll(".centroid")
     .remove();
 
-  var means = elemwise_mean(cluster_data);
+  var means = elemwise_mean(cluster_data, facets, facets_x);
   elem.select("#centroids_" + cur_cluster)
     .selectAll(".centroid")
     .data(means).enter()
@@ -144,35 +144,23 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color) {
     });
 }
 
-function elemwise_mean(x_array) {
-  var facets = [];
-  var keys = [];
-  var x_concat = [];
-  for (var i = 0; i < x_array.length; i++) {
-    facets = facets.concat(extract_unique(x_array[i], "facet"));
-    keys = keys.concat(extract_unique(x_array[i], "facet_x"));
-    x_concat = x_concat.concat(x_array[i]);
-  }
-  facets = d3.set(facets).values();
-  keys = d3.set(keys).values();
-
+function elemwise_mean(x_array, facets, facets_x) {
   var means = [];
   for (var j = 0; j < facets.length; j++) {
+    var array_sub = x_array.filter(function(d) { return d[0].facet == facets[j]; });
     var facet_mean = [];
-    for (var k = 0; k < keys.length; k++) {
-      var filter_data = x_concat
-          .filter(function(d) { return d.facet == facets[j] && d.facet_x == keys[k]; })
-          .map(function(d) { return d.value; });
-      if (filter_data.length > 0) {
-        facet_mean.push({
+    for (var t = 0; t < array_sub[0].length; t++) {
+      facet_mean.push(
+        {
           "facet": facets[j],
-          "facet_x": parseFloat(keys[k]),
-          "value": d3.mean(filter_data)
-        });
-      }
+          "facet_x": array_sub[0][t].facet_x,
+          "value": d3.mean(array_sub.map(function(x) { return x[t].value; }))
+        }
+      );
     }
     means.push(facet_mean);
   }
+
   return means;
 }
 

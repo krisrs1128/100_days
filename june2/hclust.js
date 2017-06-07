@@ -36,6 +36,7 @@ elem.selectAll("g")
   .attr("id", function(d) { return d; });
 
 var scales = scales_dictionary(tree, data, opts);
+var facet_x = extract_unique(data, "facet_x");
 d3.cluster()(root);
 
 // Draw the tree
@@ -73,7 +74,9 @@ elem.select("#subtree_0")
       ts_data,
       cur_tree.leaves().map(id_fun),
       cur_cluster,
-      scales.cluster_cols[cur_cluster]
+      scales.cluster_cols[cur_cluster],
+      scales.facet_offset.domain(),
+      facet_x
     );
     update_heatmap(
       elem,
