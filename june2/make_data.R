@@ -60,11 +60,10 @@ join_sources <- function(x, taxa, samples, dendro, h = 0.5) {
     mutate(centroid = mean(scaled))
 }
 
-
 ## ---- data ----
 download.file("https://github.com/krisrs1128/treelapse/raw/master/data/abt.rda", "abt.rda")
 abt <- get(load("abt.rda")) %>%
-  filter_taxa(function(x) { var(x) > 5 }, TRUE)
+  filter_taxa(function(x) { var(x) > 10 }, TRUE)
 
 x <- t(get_taxa(abt))
 
