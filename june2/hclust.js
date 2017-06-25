@@ -127,35 +127,3 @@ var line = d3.line()
     .y(function(d) {
       return scales.facet_offset(d.facet) + scales.centroid_y(d.value);
     });
-
-function update_wrapper(d) {
-  var cur_tree = subtree(root, d.data.id);
-  update_heatmap_focus(
-    elem.select("#hm_focus_" + cur_cluster),
-    cur_tree,
-    scales.tree_x,
-    scales.cluster_cols[cur_cluster]
-  );
-  update_tree_focus(
-    elem,
-    cur_tree.descendants(),
-    cur_cluster,
-    opts.n_clusters,
-    scales.tree_x,
-    scales.tree_y,
-    scales.cluster_cols[cur_cluster]
-  );
-  update_ts_focus(
-    elem,
-    ts_data,
-    cur_tree.leaves().map(id_fun),
-    cur_cluster,
-    scales.cluster_cols[cur_cluster],
-    scales.facet_offset.domain(),
-    facet_x
-  );
-  update_heatmap(
-    elem,
-    opts.n_clusters
-  );
-}

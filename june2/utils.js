@@ -144,6 +144,38 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, face
     });
 }
 
+function update_wrapper(d) {
+  var cur_tree = subtree(root, d.data.id);
+  update_heatmap_focus(
+    elem.select("#hm_focus_" + cur_cluster),
+    cur_tree,
+    scales.tree_x,
+    scales.cluster_cols[cur_cluster]
+  );
+  update_tree_focus(
+    elem,
+    cur_tree.descendants(),
+    cur_cluster,
+    opts.n_clusters,
+    scales.tree_x,
+    scales.tree_y,
+    scales.cluster_cols[cur_cluster]
+  );
+  update_ts_focus(
+    elem,
+    ts_data,
+    cur_tree.leaves().map(id_fun),
+    cur_cluster,
+    scales.cluster_cols[cur_cluster],
+    scales.facet_offset.domain(),
+    facet_x
+  );
+  update_heatmap(
+    elem,
+    opts.n_clusters
+  );
+}
+
 function elemwise_mean(x_array, facets, facets_x) {
   var means = [];
   for (var j = 0; j < facets.length; j++) {
