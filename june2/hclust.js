@@ -13,7 +13,6 @@ d3.select("#vis")
 
 d3.select("body")
   .on("keydown", function(d, i) {
-    console.log(d3.event.keyCode);
     if (d3.event.keyCode == 13) {
       if (max_cluster < opts.n_clusters) {
         max_cluster += 1;
@@ -23,8 +22,8 @@ d3.select("body")
       cur_cluster = cur_cluster % max_cluster + 1;
     } else if (d3.event.keyCode == 74) {
       var tmp = cur_cluster % max_cluster - 1;
-      if (tmp == 0) {
-        tmp = max_cluster;
+      if (tmp < 1) {
+        tmp += max_cluster;
       }
       cur_cluster = tmp;
     }
