@@ -6,14 +6,25 @@ var root = d3.stratify()
 var opts = parameter_defaults({});
 
 var cur_cluster = 1;
-var buttons = d3.select("#vis")
-    .append("g")
-    .attrs({"id": "widgets"})
-    .selectAll("button")
-    .data(["New Cluster", "Cycle Cluster"]).enter()
-    .append("button")
-    .attrs({"id": function(d) { return d; }})
-    .text(function(d) { return d; });
+var max_cluster = 1;
+d3.select("#vis")
+  .append("g")
+  .attrs({"id": "widgets"});
+
+d3.select("#widgets")
+  .append("button")
+  .text("New Cluster")
+  .on("click", function(d) {
+    max_cluster += 1;
+    cur_cluster = max_cluster;
+  });
+
+d3.select("#widgets")
+  .append("button")
+  .text("Cycle Cluster")
+  .on("click", function(d) {
+    cur_cluster = cur_cluster % max_cluster + 1;
+  });
 
 var elem = d3.select("#vis")
     .append("svg")
