@@ -198,7 +198,7 @@ function elemwise_mean(x_array, facets, facets_x) {
 
 function parameter_defaults(opts) {
   var default_opts = {
-    "n_clusters": 3,
+    "n_clusters": 10,
     "elem_height": 350,
     "elem_width": 1200,
     "tree_y_prop": 0.2,
@@ -247,7 +247,7 @@ function scales_dictionary(tree, data, opts) {
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.elem_height / facets.length, 0]),
-    "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
+    "cluster_cols": ["#555", '#8dd3c7','#fb8072','#bebada','#fdb462','#b3de69','#80b1d3','#fccde5','#d9d9d9','#bc80bd','#ffffb3'],
     "facet_offset": d3.scaleBand()
       .domain(facets)
       .range([0, opts.elem_height])

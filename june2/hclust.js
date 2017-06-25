@@ -15,8 +15,10 @@ d3.select("body")
   .on("keydown", function(d, i) {
     console.log(d3.event.keyCode);
     if (d3.event.keyCode == 13) {
-      max_cluster += 1;
-      cur_cluster = max_cluster;
+      if (max_cluster < opts.n_clusters) {
+        max_cluster += 1;
+        cur_cluster = max_cluster;
+      }
     } else if (d3.event.keyCode == 75) {
       cur_cluster = cur_cluster % max_cluster + 1;
     } else if (d3.event.keyCode == 74) {
