@@ -4,6 +4,17 @@ var root = d3.stratify()
     .parentId(function(d) { return d.parent; })(tree);
 
 var opts = parameter_defaults({});
+
+var cur_cluster = 1;
+var buttons = d3.select("#vis")
+    .append("g")
+    .attrs({"id": "widgets"})
+    .selectAll("button")
+    .data(["New Cluster", "Cycle Cluster"]).enter()
+    .append("button")
+    .attrs({"id": function(d) { return d; }})
+    .text(function(d) { return d; });
+
 var elem = d3.select("#vis")
     .append("svg")
     .attrs({
@@ -19,7 +30,6 @@ elem.append("rect")
   });
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
-var cur_cluster = 1;
 var group_labels = ["tiles", "tile_cover", "links", "voronoi"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
