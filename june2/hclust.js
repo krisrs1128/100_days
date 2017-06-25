@@ -20,7 +20,7 @@ elem.append("rect")
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
 var cur_cluster = 1;
-var group_labels = ["tiles", "tile_cover", "links"];
+var group_labels = ["tiles", "tile_cover", "links", "voronoi"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -51,38 +51,27 @@ elem.select("#subtree_0")
     "fill-opacity": 0.4,
     "cx": function(d) { return scales.tree_x(d.data.x); },
     "cy": function(d) { return scales.tree_y(d.data.y); }
-  })
-  .on("mouseover", function(d) {
-    var cur_tree = subtree(root, d.id);
-    update_heatmap_focus(
-      elem.select("#hm_focus_" + cur_cluster),
-      cur_tree,
-      scales.tree_x,
-      scales.cluster_cols[cur_cluster]
-    );
-    update_tree_focus(
-      elem,
-      cur_tree.descendants(),
-      cur_cluster,
-      opts.n_clusters,
-      scales.tree_x,
-      scales.tree_y,
-      scales.cluster_cols[cur_cluster]
-    );
-    update_ts_focus(
-      elem,
-      ts_data,
-      cur_tree.leaves().map(id_fun),
-      cur_cluster,
-      scales.cluster_cols[cur_cluster],
-      scales.facet_offset.domain(),
-      facet_x
-    );
-    update_heatmap(
-      elem,
-      opts.n_clusters
-    );
   });
+
+// Define voronoi polygons for the tree nodes
+var voronoi = d3.voronoi()
+    .x(function(d) {
+      return scales.tree_x(d.data.x); })
+    .y(function(d) { return scales.tree_y(d.data.y); })
+    .extent([[0, 0], [scales.tree_x.range()[1], scales.tree_y.range()[0]]]);
+
+elem.select("#voronoi")
+  .selectAll(".voronoi")
+  .data(voronoi(root.descendants()).polygons()).enter()
+  .append("path")
+  .attrs({
+    "id": function(d) { return d.data.id; },
+    "d": function(d) { return "M" + d.join("L") + "Z"; },
+    "class": "voronoi",
+    "fill": "none",
+    "pointer-events": "all"
+  })
+  .on("mouseover", update_wrapper);
 
 var link_fun = d3.linkVertical()
     .x(function(d) { return scales.tree_x(d.data.x); })
@@ -138,3 +127,35 @@ var line = d3.line()
     .y(function(d) {
       return scales.facet_offset(d.facet) + scales.centroid_y(d.value);
     });
+
+function update_wrapper(d) {
+  var cur_tree = subtree(root, d.data.id);
+  update_heatmap_focus(
+    elem.select("#hm_focus_" + cur_cluster),
+    cur_tree,
+    scales.tree_x,
+    scales.cluster_cols[cur_cluster]
+  );
+  update_tree_focus(
+    elem,
+    cur_tree.descendants(),
+    cur_cluster,
+    opts.n_clusters,
+    scales.tree_x,
+    scales.tree_y,
+    scales.cluster_cols[cur_cluster]
+  );
+  update_ts_focus(
+    elem,
+    ts_data,
+    cur_tree.leaves().map(id_fun),
+    cur_cluster,
+    scales.cluster_cols[cur_cluster],
+    scales.facet_offset.domain(),
+    facet_x
+  );
+  update_heatmap(
+    elem,
+    opts.n_clusters
+  );
+}
