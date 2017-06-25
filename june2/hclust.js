@@ -11,19 +11,21 @@ d3.select("#vis")
   .append("g")
   .attrs({"id": "widgets"});
 
-d3.select("#widgets")
-  .append("button")
-  .text("New Cluster")
-  .on("click", function(d) {
-    max_cluster += 1;
-    cur_cluster = max_cluster;
-  });
-
-d3.select("#widgets")
-  .append("button")
-  .text("Cycle Cluster")
-  .on("click", function(d) {
-    cur_cluster = cur_cluster % max_cluster + 1;
+d3.select("body")
+  .on("keydown", function(d, i) {
+    console.log(d3.event.keyCode);
+    if (d3.event.keyCode == 13) {
+      max_cluster += 1;
+      cur_cluster = max_cluster;
+    } else if (d3.event.keyCode == 75) {
+      cur_cluster = cur_cluster % max_cluster + 1;
+    } else if (d3.event.keyCode == 74) {
+      var tmp = cur_cluster % max_cluster - 1;
+      if (tmp == 0) {
+        tmp = max_cluster;
+      }
+      cur_cluster = tmp;
+    }
   });
 
 var elem = d3.select("#vis")
@@ -76,10 +78,9 @@ elem.select("#subtree_0")
 
 // Define voronoi polygons for the tree nodes
 var voronoi = d3.voronoi()
-    .x(function(d) {
-      return scales.tree_x(d.data.x); })
+    .x(function(d) {return scales.tree_x(d.data.x); })
     .y(function(d) { return scales.tree_y(d.data.y); })
-    .extent([[0, 0], [scales.tree_x.range()[1], scales.tree_y.range()[0]]]);
+    .extent([[0, 0], [scales.tree_x.range()[1], 20 + scales.tree_y.range()[0]]]);
 
 elem.select("#voronoi")
   .selectAll(".voronoi")
