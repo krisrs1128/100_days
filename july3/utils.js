@@ -110,6 +110,27 @@ function selected_ids(elem, n_clusters) {
   return cur_labels;
 }
 
+function group_counts(elem, n_clusters) {
+  var cluster_counts = {};
+  for (var k = 1; k <= n_clusters; k++) {
+    var cur_ids = elem.select("#subtree_" + k)
+        .selectAll(".hcnode").data()
+        .map(id_fun);
+    var groups = data.filter(function(d) { return d.row == "D1"; })
+        .filter(function(d) { return cur_ids.indexOf(d.column) != -1; })
+        .map(function(d) { return d.group; });
+
+    var counts = {};
+    for(var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      counts[group] = counts[group] ? counts[group]+1 : 1;
+    }
+    cluster_counts[k] = counts;
+  }
+
+  return cluster_counts;
+}
+
 function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, facets, facets_x) {
   var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
   elem.select("#time_series_" + cur_cluster)
