@@ -13,13 +13,12 @@ function subtree(hierarchy, query_id) {
   }
 }
 
-function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
-  var cur_x = cur_tree.leaves()
+function update_heatmap_focus(focus_elem, cur_tree, y_scale, stroke_color, tile_x_scale) {
+  var cur_y = cur_tree.leaves()
       .map(function(d) { return d.data.x; });
 
-  var bandwidth = x_scale.range()[1] / (x_scale.domain()[1] - x_scale.domain()[0]);
-  var height = elem.attr("height");
-  var x_extent = d3.extent(cur_x);
+  var bandwidth = y_scale.range()[1] / (y_scale.domain()[1] - y_scale.domain()[0]);
+  var y_extent = d3.extent(cur_y);
 
   var focus_rect = focus_elem.select("rect");
   var n_rects = focus_rect.nodes().length;
@@ -32,10 +31,10 @@ function update_heatmap_focus(focus_elem, cur_tree, x_scale, stroke_color) {
     .duration(500)
     .attrs({
       "class": "hm_focus",
-      "x": x_scale(x_extent[0]),
-      "y": height / 5,
-      "width": x_scale(x_extent[1]) - x_scale(x_extent[0]) + bandwidth,
-      "height": 4 / 5 * height,
+      "y": y_scale(y_extent[0]),
+      "x": tile_x_scale.range()[0],
+      "height": y_scale(y_extent[1]) - y_scale(y_extent[0]) + bandwidth,
+      "width": tile_x_scale.range()[1] - tile_x_scale.range()[0],
       "stroke": stroke_color,
       "stroke-opacity": 0.7,
       "fill": "none"
@@ -201,7 +200,7 @@ function scales_dictionary(tree, data, opts) {
   return {
     "tile_x": d3.scaleBand()
       .domain(extract_unique(data, "row"))
-      .range([opts.tree_x_prop * opts.elem_width, (1 - opts.facet_x_prop) * opts.elem_width]),
+      .range([10 + opts.tree_x_prop * opts.elem_width, (1 - opts.facet_x_prop) * opts.elem_width]),
     "tile_fill": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range(["#f8f8f8", "black"]),

@@ -99,7 +99,7 @@ elem.select("#subtree_0")
 var voronoi = d3.voronoi()
     .x(function(d) {return scales.tree_x(d.data.y); })
     .y(function(d) {return scales.tree_y(d.data.x); })
-    .extent([[0, 0], [scales.tree_x.range()[0], scales.tree_y.range()[1]]]);
+    .extent([[0, 0], [scales.tile_x.range()[0], scales.tree_y.range()[1]]]);
 
 elem.select("#voronoi")
   .selectAll(".voronoi")
@@ -178,8 +178,9 @@ function update_wrapper(d) {
   update_heatmap_focus(
     elem.select("#hm_focus_" + cur_cluster),
     cur_tree,
-    scales.tree_x,
-    scales.cluster_cols[cur_cluster]
+    scales.tree_y,
+    scales.cluster_cols[cur_cluster],
+    scales.tile_x
   );
   update_tree_focus(
     elem,
