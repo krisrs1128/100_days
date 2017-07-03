@@ -167,10 +167,12 @@ function elemwise_mean(x_array, facets, facets_x) {
 function parameter_defaults(opts) {
   var default_opts = {
     "n_clusters": 3,
-    "elem_height": 1200,
-    "elem_width": 350,
+    "elem_height": 850,
+    "elem_width": 800,
     "tree_y_prop": 1,
-    "tree_x_prop": 0.2
+    "tree_x_prop": 0.1,
+    "facet_x_prop": 0.35,
+    "facet_y_prop": 0.7
   };
 
   var keys = Object.keys(default_opts);
@@ -199,7 +201,7 @@ function scales_dictionary(tree, data, opts) {
   return {
     "tile_x": d3.scaleBand()
       .domain(extract_unique(data, "row"))
-      .range([opts.tree_x_prop * opts.elem_width, opts.elem_width]),
+      .range([opts.tree_x_prop * opts.elem_width, (1 - opts.facet_x_prop) * opts.elem_width]),
     "tile_fill": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range(["#f8f8f8", "black"]),
@@ -211,10 +213,10 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([opts.elem_width * opts.tree_x_prop, opts.elem_width]),
+      .range([( - opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
-      .range([opts.elem_height / facets.length, 0]),
+      .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
     "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
     "facet_offset": d3.scaleBand()
       .domain(facets)

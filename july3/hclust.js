@@ -96,8 +96,8 @@ elem.select("#tiles")
     "class": "tile",
     "x": function(d) { return scales.tile_x(d.row); },
     "y": function(d) { return scales.tree_y(d.x); },
-    "width": bandwidth,
-    "height": scales.tile_x.bandwidth(),
+    "width": scales.tile_x.bandwidth(),
+    "height": bandwidth,
     "fill": function(d) { return scales.tile_fill(d.value); }
   });
 
