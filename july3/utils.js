@@ -83,8 +83,8 @@ function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale,
       "r": 2,
       "fill": fill_color,
       "fill-opacity": 0.4,
-      "cx": function(d) { return x_scale(d.data.x); },
-      "cy": function(d) { return y_scale(d.data.y); }
+      "cx": function(d) { return x_scale(d.data.y); },
+      "cy": function(d) { return y_scale(d.data.x); }
     });
 
   var highlight_ids = selected_ids(elem, n_clusters);
@@ -172,7 +172,7 @@ function parameter_defaults(opts) {
     "tree_y_prop": 1,
     "tree_x_prop": 0.1,
     "facet_x_prop": 0.35,
-    "facet_y_prop": 0.7
+    "facet_y_prop": 0.55
   };
 
   var keys = Object.keys(default_opts);
@@ -213,14 +213,14 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([( - opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
+      .range([(1.01 - opts.facet_x_prop) * opts.elem_width, 0.98 * opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
     "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
     "facet_offset": d3.scaleBand()
       .domain(facets)
-      .range([0, opts.elem_height])
+      .range([0, opts.facet_y_prop * opts.elem_height])
   };
 
 }

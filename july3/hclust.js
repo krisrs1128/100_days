@@ -53,24 +53,24 @@ elem.select("#subtree_0")
     "cy": function(d) { return scales.tree_y(d.data.x); }
   });
 
-// // Define voronoi polygons for the tree nodes
-// var voronoi = d3.voronoi()
-//     .x(function(d) {return scales.tree_x(d.data.y); })
-//     .y(function(d) {return scales.tree_y(d.data.x); })
-//     .extent([[0, 0], [scales.tree_x.range()[1], scales.tree_y.range()[0]]]);
+// Define voronoi polygons for the tree nodes
+var voronoi = d3.voronoi()
+    .x(function(d) {return scales.tree_x(d.data.y); })
+    .y(function(d) {return scales.tree_y(d.data.x); })
+    .extent([[0, 0], [scales.tree_x.range()[0], scales.tree_y.range()[1]]]);
 
-// elem.select("#voronoi")
-//   .selectAll(".voronoi")
-//   .data(voronoi(root.descendants()).polygons()).enter()
-//   .append("path")
-//   .attrs({
-//     "id": function(d) { return d.data.id; },
-//     "d": function(d) { return "M" + d.join("L") + "Z"; },
-//     "class": "voronoi",
-//     "fill": "none",
-//     "pointer-events": "all"
-//   })
-//   .on("mouseover", update_wrapper);
+elem.select("#voronoi")
+  .selectAll(".voronoi")
+  .data(voronoi(root.descendants()).polygons()).enter()
+  .append("path")
+  .attrs({
+    "id": function(d) { return d.data.id; },
+    "d": function(d) { return "M" + d.join("L") + "Z"; },
+    "class": "voronoi",
+    "fill": "none",
+    "pointer-events": "all"
+  })
+  .on("mouseover", update_wrapper);
 
 var link_fun = d3.linkHorizontal()
     .x(function(d) { return scales.tree_x(d.data.y); })
@@ -101,23 +101,23 @@ elem.select("#tiles")
     "fill": function(d) { return scales.tile_fill(d.value); }
   });
 
-// // Draw shades / covers on the heatmap
-// var init_level = data[0].row;
-// elem.select("#tile_cover")
-//   .selectAll(".tile_cover")
-//   .data(data.filter(function(d) { return d.row == init_level;}), function(d) { return d.x; }).enter()
-//   .append("rect")
-//   .attrs({
-//     "class": "tile_cover",
-//     "x": function(d) { return scales.tree_x(d.x); },
-//     "width": bandwidth,
-//     "y": scales.tile_y.range()[0],
-//     "height": scales.tile_y.range()[1] - scales.tile_y.range()[0],
-//     "fill-opacity": 0
-//   });
+// Draw shades / covers on the heatmap
+var init_level = data[0].row;
+elem.select("#tile_cover")
+  .selectAll(".tile_cover")
+  .data(data.filter(function(d) { return d.row == init_level;}), function(d) { return d.x; }).enter()
+  .append("rect")
+  .attrs({
+    "class": "tile_cover",
+    "y": function(d) { return scales.tree_y(d.x); },
+    "height": bandwidth,
+    "x": scales.tile_x.range()[0],
+    "width": scales.tile_x.range()[1] - scales.tile_x.range()[0],
+    "fill-opacity": 0
+  });
 
-// elem.append("rect")
-//   .attrs({"class": "hm_focus"});
+elem.append("rect")
+  .attrs({"class": "hm_focus"});
 
 var line = d3.line()
     .x(function(d) {
