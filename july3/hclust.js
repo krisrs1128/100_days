@@ -209,4 +209,4 @@ elem.select("#histo_axis")
   });
 
 var histo_axis = d3.axisBottom(scales.histo_x)
-    .ticks(4, "f");
+    .ticks(3, "f");
