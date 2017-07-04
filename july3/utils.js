@@ -161,7 +161,9 @@ function update_histo(elem, scales, n_clusters, histo_axis) {
     [0, d3.max(counts.map(function(d) { return d.count; }))]
   );
 
-  elem.select("#histo_axis")
+  elem.transition()
+    .duration(700)
+    .select("#histo_axis")
     .call(histo_axis.scale(scales.histo_x));
 
   elem.select("#group_histo")
@@ -231,6 +233,7 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, face
       "class": "centroid",
       "d": line
     });
+
 }
 
 function update_wrapper(d) {
@@ -296,8 +299,8 @@ function elemwise_mean(x_array, facets, facets_x) {
 function parameter_defaults(opts) {
   var default_opts = {
     "n_clusters": 3,
-    "elem_height": 850,
-    "elem_width": 800,
+    "elem_height": 950,
+    "elem_width": 850,
     "tree_y_prop": 1,
     "tree_x_prop": 0.1,
     "facet_x_prop": 0.35,
@@ -343,17 +346,17 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([3 + (1 - opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
+      .range([30 + (1 - opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
-      .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
+      .range([opts.facet_y_prop * opts.elem_height / facets.length - 10, 0]),
     "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
     "facet_offset": d3.scaleBand()
       .domain(facets)
       .range([0, opts.facet_y_prop * opts.elem_height]),
     "histo_x": d3.scaleLinear()
       .domain([0, 100])
-      .range([0, 0.55 * opts.facet_x_prop * opts.elem_width]),
+      .range([0, 0.50 * opts.facet_x_prop * opts.elem_width]),
     "histo_group": d3.scaleBand()
       .domain(groups)
       .range([30 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),

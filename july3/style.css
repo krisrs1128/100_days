@@ -18,7 +18,7 @@
 
 .highlighted_series {
     stroke-opacity: 0.1;
-    stroke-width: 0.8;
+    stroke-width: 0.4;
     fill: none;
 }
 
@@ -37,4 +37,11 @@
     text-anchor: "end";
     font-family: "Oxygen Mono", monospace;
     font-size: 12px;
+}
+
+.facet_y {
+    stroke-width: 0.5;
+    stroke: #555;
+    font-color: #555;
+    font-family: "Oxygen Mono", monospace;
 }

@@ -18,7 +18,7 @@ melted_counts <- function(x) {
     as_data_frame %>%
     gather(key = "rsv", value = "value", -sample) %>%
     mutate(
-      scaled = asinh(value) / nrow(x),
+      scaled = asinh(value),
       present = ifelse(value > 0, 1, 0)
     )
 }
@@ -63,7 +63,7 @@ join_sources <- function(x, taxa, samples, dendro, h = 0.5) {
 ## ---- data ----
 download.file("https://github.com/krisrs1128/treelapse/raw/master/data/abt.rda", "abt.rda")
 abt <- get(load("abt.rda")) %>%
-  filter_taxa(function(x) { var(x) > 25 }, TRUE)
+  filter_taxa(function(x) { var(x) > 5 }, TRUE)
 
 x <- t(get_taxa(abt))
 

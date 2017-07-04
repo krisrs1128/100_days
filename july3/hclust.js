@@ -86,11 +86,6 @@ elem.selectAll("g")
   .append("g")
   .attr("id", function(d) { return d; });
 
-for (var i = 0; i < extract_unique(data, "facet").length; i++) {
-  elem.append("g")
-    .attr("id", "facet_axis_" + i);
-}
-
 var scales = scales_dictionary(tree, data, opts);
 var facet_x = extract_unique(data, "facet_x");
 
@@ -208,5 +203,22 @@ elem.select("#histo_axis")
       (opts.elem_height) + ")"
   });
 
+// axis objects
 var histo_axis = d3.axisBottom(scales.histo_x)
+    .tickSize(0)
     .ticks(3, "f");
+var facet_y = d3.axisLeft(scales.centroid_y)
+    .ticks(5, ".1f")
+    .tickSize(0);
+
+var facets = extract_unique(data, "facet");
+for (var i = 0; i < facets.length; i++) {
+  elem.append("g")
+    .attrs({
+      "id": "facet_y_" + i,
+      "class": "facet_y",
+      "transform": "translate(" + scales.centroid_x.range()[0] + "," +
+        scales.facet_offset(facets[i]) + ")"
+    })
+    .call(facet_y);
+}
