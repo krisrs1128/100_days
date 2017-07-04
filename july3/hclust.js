@@ -63,7 +63,8 @@ elem.append("rect")
   });
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
-var group_labels = ["tiles", "tile_cover", "links", "voronoi", "group_histo"];
+var group_labels = ["tiles", "tile_cover", "links", "voronoi", "group_histo",
+                    "histo_axes"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -80,6 +81,12 @@ elem.selectAll("g")
 
 var scales = scales_dictionary(tree, data, opts);
 var facet_x = extract_unique(data, "facet_x");
+
+for (var i = 0; i < facet_x.length; i++) {
+  elem.append("g")
+    .attr("id", "facet_axis_" + k);
+}
+
 d3.cluster()(root);
 
 // Draw the tree
@@ -173,3 +180,16 @@ var line = d3.line()
     .y(function(d) {
       return scales.facet_offset(d.facet) + scales.centroid_y(d.value);
     });
+
+elem.select("#group_histo")
+  .selectAll(".histo_label")
+  .data(extract_unique(data, "group")).enter()
+  .append("text")
+  .attrs({
+    "x": opts.elem_width,
+    "y": function(d) { return scales.histo_group(d); },
+    "class": "histo_label",
+    "alignment-baseline": "hanging",
+    "text-anchor": "end"
+  })
+  .text(function(d) { return d; });

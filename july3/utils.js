@@ -310,7 +310,7 @@ function parameter_defaults(opts) {
 }
 
 function extract_unique(x, key) {
-  var u = x.map(function(d) { return d[key]; })
+  var u = x.map(function(d) { return d[key]; });
   return d3.set(u).values();
 }
 
@@ -339,7 +339,7 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([(1.01 - opts.facet_x_prop) * opts.elem_width, 0.98 * opts.elem_width]),
+      .range([(1.05 - opts.facet_x_prop) * opts.elem_width, 0.98 * opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
@@ -349,7 +349,7 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.facet_y_prop * opts.elem_height]),
     "histo_x": d3.scaleLinear()
       .domain([0, 100])
-      .range([0, opts.facet_x_prop * opts.elem_width]),
+      .range([0, 0.55 * opts.facet_x_prop * opts.elem_width]),
     "histo_group": d3.scaleBand()
       .domain(groups)
       .range([20 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),
