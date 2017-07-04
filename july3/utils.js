@@ -154,15 +154,15 @@ function group_array(elem, n_clusters) {
   );
 }
 
-function update_histo(elem, scales, n_clusters) {
+function update_histo(elem, scales, n_clusters, histo_axis) {
   // reset scales
   var counts = group_array(elem, n_clusters);
   scales.histo_x.domain(
     [0, d3.max(counts.map(function(d) { return d.count; }))]
   );
 
-  // elem.select("#histo_axis")
-  //   .call(d3.axisTop(scales.histo_x))
+  elem.select("#histo_axis")
+    .call(histo_axis.scale(scales.histo_x));
 
   elem.select("#group_histo")
     .selectAll(".histo_bar")
@@ -267,7 +267,8 @@ function update_wrapper(d) {
   update_histo(
     elem,
     scales,
-    opts.n_clusters
+    opts.n_clusters,
+    histo_axis
   );
 }
 
@@ -342,7 +343,7 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([3 + (1- opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
+      .range([3 + (1 - opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
@@ -355,10 +356,10 @@ function scales_dictionary(tree, data, opts) {
       .range([0, 0.55 * opts.facet_x_prop * opts.elem_width]),
     "histo_group": d3.scaleBand()
       .domain(groups)
-      .range([20 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),
+      .range([30 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),
     "histo_offset": d3.scaleBand()
       .domain([1, 2])
-      .range([0, (opts.facet_y_prop * opts.elem_height - 20) / groups.length])
+      .range([0, (opts.facet_y_prop * opts.elem_height - 30) / groups.length])
   };
 
 }
