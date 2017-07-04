@@ -168,11 +168,17 @@ function update_histo(elem, scales, n_clusters) {
     .attrs({
      "class": "histo_bar",
       "x": scales.centroid_x.range()[0],
-      "width": function(d) { return scales.histo_x(d.count); },
+      "width": 0,
       "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.cluster);},
       "height": scales.histo_offset.step(),
       "fill": function(d) { return scales.cluster_cols[d.cluster]; }
     });
+
+  elem.select("#group_histo")
+    .selectAll(".histo_bar")
+    .data(counts, function(d) { return d.cluster + d.group; }).exit()
+    .attrs({"width": 0})
+    .remove();
 
   elem.select("#group_histo")
     .selectAll(".histo_bar")
@@ -202,15 +208,21 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, face
       "d": line
     });
 
-  elem.select("#centroids_" + cur_cluster)
-    .selectAll(".centroid")
-    .remove();
-
   var means = elemwise_mean(cluster_data, facets, facets_x);
   elem.select("#centroids_" + cur_cluster)
     .selectAll(".centroid")
     .data(means).enter()
     .append("path")
+    .attrs({
+      "stroke": stroke_color,
+      "class": "centroid",
+      "d": line
+    });
+
+  elem.select("#centroids_" + cur_cluster)
+    .selectAll(".centroid")
+    .transition()
+    .duration(700)
     .attrs({
       "stroke": stroke_color,
       "class": "centroid",
