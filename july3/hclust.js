@@ -64,7 +64,7 @@ elem.append("rect")
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
 var group_labels = ["tiles", "tile_cover", "links", "voronoi", "group_histo",
-                    "histo_axes"];
+                    "histo_axis"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -79,13 +79,13 @@ elem.selectAll("g")
   .append("g")
   .attr("id", function(d) { return d; });
 
+for (var i = 0; i < extract_unique(data, "facet").length; i++) {
+  elem.append("g")
+    .attr("id", "facet_axis_" + i);
+}
+
 var scales = scales_dictionary(tree, data, opts);
 var facet_x = extract_unique(data, "facet_x");
-
-for (var i = 0; i < facet_x.length; i++) {
-  elem.append("g")
-    .attr("id", "facet_axis_" + k);
-}
 
 d3.cluster()(root);
 
@@ -193,3 +193,8 @@ elem.select("#group_histo")
     "text-anchor": "end"
   })
   .text(function(d) { return d; });
+
+// elem.select("#histo_axis")
+//   .attrs({
+//     "transform": "translate("  + scales.centroid_x.range[0] + "," + scales.facet_y_prop * opts.elem_height + ")"
+//   });

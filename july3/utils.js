@@ -161,6 +161,9 @@ function update_histo(elem, scales, n_clusters) {
     [0, d3.max(counts.map(function(d) { return d.count; }))]
   );
 
+  // elem.select("#histo_axis")
+  //   .call(d3.axisTop(scales.histo_x))
+
   elem.select("#group_histo")
     .selectAll(".histo_bar")
     .data(counts, function(d) { return d.cluster + d.group; }).enter()
@@ -339,7 +342,7 @@ function scales_dictionary(tree, data, opts) {
       .range([0, opts.tree_y_prop * opts.elem_height]),
     "centroid_x": d3.scaleLinear()
       .domain(d3.extent(facet_x))
-      .range([(1.05 - opts.facet_x_prop) * opts.elem_width, 0.98 * opts.elem_width]),
+      .range([3 + (1- opts.facet_x_prop) * opts.elem_width, opts.elem_width]),
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_vals))
       .range([opts.facet_y_prop * opts.elem_height / facets.length, 0]),
