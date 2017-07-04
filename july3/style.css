@@ -23,7 +23,25 @@
 }
 
 .centroid {
-    stroke-opacity: 0.9;
+    stroke-opacity: 1;
     stroke-width: 2;
     fill: none;
+}
+
+.histo_bar {
+    fill-opacity: 0.7;
+}
+
+.histo_label {
+    alignment-baseline: "hanging";
+    text-anchor: "end";
+    font-family: "Oxygen Mono", monospace;
+    font-size: 12px;
+}
+
+.facet_y {
+    stroke-width: 0.5;
+    stroke: #555;
+    font-color: #555;
+    font-family: "Oxygen Mono", monospace;
 }
