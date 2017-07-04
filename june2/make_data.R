@@ -129,7 +129,7 @@ cat(sprintf("var tree = %s;", jsonlite::toJSON(phy_df)), file = "~/Desktop/100_d
 
 js_data <- mx %>%
   ungroup() %>%
-  arrange(leaf_ix) %>%
+  arrange(label) %>%
   dplyr::select(sample, ind, time, rsv, label, scaled) %>%
   rename(
     column = rsv,
