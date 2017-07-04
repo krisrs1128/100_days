@@ -131,6 +131,60 @@ function group_counts(elem, n_clusters) {
   return cluster_counts;
 }
 
+function counts_array(counts) {
+  var arr = [];
+  var clusters = Object.keys(counts);
+  for (var k = 0; k < clusters.length; k++) {
+    var groups = Object.keys(counts[clusters[k]]);
+    for (var i = 0; i < groups.length; i++) {
+      arr.push({
+        "cluster": clusters[k],
+        "group": groups[i],
+        "count": counts[clusters[k]][groups[i]]
+      });
+    }
+  }
+
+  return arr;
+}
+
+function group_array(elem, n_clusters) {
+  return counts_array(
+    group_counts(elem, n_clusters)
+  );
+}
+
+function update_histo(elem, scales, n_clusters) {
+  // reset scales
+  var counts = group_array(elem, n_clusters);
+  scales.histo_x.domain(
+    [0, d3.max(counts.map(function(d) { return d.count; }))]
+  );
+
+  elem.select("#group_histo")
+    .selectAll(".histo_bar")
+    .data(counts, function(d) { return d.cluster + d.group; }).enter()
+    .append("rect")
+    .attrs({
+     "class": "histo_bar",
+      "x": scales.centroid_x.range()[0],
+      "width": function(d) { return scales.histo_x(d.count); },
+      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.cluster);},
+      "height": scales.histo_offset.step(),
+      "fill": function(d) { return scales.cluster_cols[d.cluster]; }
+    });
+
+  elem.select("#group_histo")
+    .selectAll(".histo_bar")
+    .transition()
+    .duration(700)
+    .attrs({
+      "width": function(d) { return scales.histo_x(d.count); },
+      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.cluster);},
+      "height": scales.histo_offset.step()
+    });
+}
+
 function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, facets, facets_x) {
   var cluster_data = ts_data.filter(function(d) { return cur_ids.indexOf(d[0].column) != -1; });
   elem.select("#time_series_" + cur_cluster)
@@ -163,6 +217,45 @@ function update_ts_focus(elem, ts_data, cur_ids, cur_cluster, stroke_color, face
       "d": line
     });
 }
+
+function update_wrapper(d) {
+  var cur_tree = subtree(root, d.data.id);
+  update_heatmap_focus(
+    elem.select("#hm_focus_" + cur_cluster),
+    cur_tree,
+    scales.tree_y,
+    scales.cluster_cols[cur_cluster],
+    scales.tile_x
+  );
+  update_tree_focus(
+    elem,
+    cur_tree.descendants(),
+    cur_cluster,
+    opts.n_clusters,
+    scales.tree_x,
+    scales.tree_y,
+    scales.cluster_cols[cur_cluster]
+  );
+  update_ts_focus(
+    elem,
+    ts_data,
+    cur_tree.leaves().map(id_fun),
+    cur_cluster,
+    scales.cluster_cols[cur_cluster],
+    scales.facet_offset.domain(),
+    facet_x
+  );
+  update_heatmap(
+    elem,
+    opts.n_clusters
+  );
+  update_histo(
+    elem,
+    scales,
+    opts.n_clusters
+  );
+}
+
 
 function elemwise_mean(x_array, facets, facets_x) {
   var means = [];
@@ -215,6 +308,7 @@ function scales_dictionary(tree, data, opts) {
     "y": tree.map(function(d) { return d.y; })
   };
   var facets = extract_unique(data, "facet");
+  var groups = extract_unique(data, "group");
   var fill_vals = data.map(function(d) { return d.value; });
   var facet_x = extract_unique(data, "facet_x").map(parseFloat);
 
@@ -240,7 +334,16 @@ function scales_dictionary(tree, data, opts) {
     "cluster_cols": ["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854'],
     "facet_offset": d3.scaleBand()
       .domain(facets)
-      .range([0, opts.facet_y_prop * opts.elem_height])
+      .range([0, opts.facet_y_prop * opts.elem_height]),
+    "histo_x": d3.scaleLinear()
+      .domain([0, 100])
+      .range([0, opts.facet_x_prop * opts.elem_width]),
+    "histo_group": d3.scaleBand()
+      .domain(groups)
+      .range([20 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),
+    "histo_offset": d3.scaleBand()
+      .domain([1, 2])
+      .range([0, (opts.facet_y_prop * opts.elem_height - 20) / groups.length])
   };
 
 }

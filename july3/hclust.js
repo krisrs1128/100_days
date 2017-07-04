@@ -33,6 +33,7 @@ d3.select("body")
       if (max_cluster < opts.n_clusters) {
         max_cluster += 1;
         cur_cluster = max_cluster;
+        scales.histo_offset.domain(d3.range(1, max_cluster + 2));
       }
 
     // Cycle across clusters
@@ -62,7 +63,7 @@ elem.append("rect")
   });
 
 // layer 0 represents all samples / features, and is always on top (even if invisible)
-var group_labels = ["tiles", "tile_cover", "links", "voronoi"];
+var group_labels = ["tiles", "tile_cover", "links", "voronoi", "group_histo"];
 for (var k = opts.n_clusters; k >= 0; k--) {
   group_labels = group_labels.concat([
     "subtree_" + k,
@@ -172,36 +173,3 @@ var line = d3.line()
     .y(function(d) {
       return scales.facet_offset(d.facet) + scales.centroid_y(d.value);
     });
-
-function update_wrapper(d) {
-  var cur_tree = subtree(root, d.data.id);
-  update_heatmap_focus(
-    elem.select("#hm_focus_" + cur_cluster),
-    cur_tree,
-    scales.tree_y,
-    scales.cluster_cols[cur_cluster],
-    scales.tile_x
-  );
-  update_tree_focus(
-    elem,
-    cur_tree.descendants(),
-    cur_cluster,
-    opts.n_clusters,
-    scales.tree_x,
-    scales.tree_y,
-    scales.cluster_cols[cur_cluster]
-  );
-  update_ts_focus(
-    elem,
-    ts_data,
-    cur_tree.leaves().map(id_fun),
-    cur_cluster,
-    scales.cluster_cols[cur_cluster],
-    scales.facet_offset.domain(),
-    facet_x
-  );
-  update_heatmap(
-    elem,
-    opts.n_clusters
-  );
-}
