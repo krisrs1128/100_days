@@ -19,8 +19,15 @@ var elem = d3.select("body")
     });
 
 elem.append("g")
-  .attr("id", "mouseover_text")
-  .append("text");
+  .attr("id", "mouseover_text");
+
+
+var brush = d3.brush()
+    .extent([[0, 0], [width, height]])
+    .on("brush", brushed);
+elem.append("g")
+  .attr("class", "brush")
+  .call(brush);
 
 var data = [];
 for (var i = 0; i < 100; i++) {
@@ -58,4 +65,28 @@ function mouseover_fun(d) {
       "transform": "translate(" + scales.x(d.x) + "," + scales.y(d.y) + ")"
     })
     .text(d.x + ", " + d.y);
+}
+
+function brushed() {
+  var cur_select = d3.event.selection;
+  var x_low = scales.x.invert(cur_select[0][0], cur_select[0][1]);
+  var y_low = scales.x.invert(cur_select[1][0], cur_select[1][1]);
+
+  elem.selectAll(".circle")
+    .attrs({
+      "fill": function(d) {
+        if (d.x < scales.x.invert(cur_select[0][0])) {
+          return "black";
+        } else if (d.x > scales.x.invert(cur_select[1][0])) {
+          return "black";
+        } else if (d.y < scales.y.invert(cur_select[0][1])) {
+          return "black";
+        } else if (d.y > scales.y.invert(cur_select[1][1])) {
+          return "black";
+        } else {
+          return "red";
+        }
+      }
+    });
+
 }
