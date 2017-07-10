@@ -17,11 +17,6 @@ var elem = d3.select("body")
       "width": width,
       "height": height
     });
-
-elem.append("g")
-  .attr("id", "mouseover_text");
-
-
 var brush = d3.brush()
     .extent([[0, 0], [width, height]])
     .on("brush", brushed);
@@ -46,11 +41,12 @@ var scales = {
     .range([0, height])
 };
 
-elem.selectAll(".circle")
+elem.append("g")
+  .attr("id", "circles")
+  .selectAll("circle")
   .data(data).enter()
   .append("circle")
   .attrs({
-    "class": "circle",
     "cx": function(d) { return scales.x(d.x); },
     "cy": function(d) { return scales.y(d.y); },
     "r": 5,
@@ -72,7 +68,8 @@ function brushed() {
   var x_low = scales.x.invert(cur_select[0][0], cur_select[0][1]);
   var y_low = scales.x.invert(cur_select[1][0], cur_select[1][1]);
 
-  elem.selectAll(".circle")
+  elem.select("#circles")
+    .selectAll("circle")
     .attrs({
       "fill": function(d) {
         if (d.x < scales.x.invert(cur_select[0][0])) {
@@ -88,5 +85,8 @@ function brushed() {
         }
       }
     });
-
 }
+
+elem.append("g")
+  .attr("id", "mouseover_text")
+  .append("text");
