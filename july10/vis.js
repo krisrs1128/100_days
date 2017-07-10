@@ -18,9 +18,16 @@ var elem = d3.select("body")
       "height": height
     });
 
+elem.append("g")
+  .attr("id", "mouseover_text")
+  .append("text");
+
 var data = [];
 for (var i = 0; i < 100; i++) {
-  data.push({"x": Math.random(), "y": Math.random()});
+  data.push({
+    "x": Math.round(1000 * Math.random(), 5) / 1000,
+    "y": Math.round(1000 * Math.random(), 5) / 1000
+  });
 }
 
 var scales = {
@@ -41,4 +48,14 @@ elem.selectAll(".circle")
     "cy": function(d) { return scales.y(d.y); },
     "r": 5,
     "fill": "black"
-  });
+  })
+  .on("mouseover", mouseover_fun);
+
+function mouseover_fun(d) {
+  d3.select("#mouseover_text text")
+    .attrs({
+      "opacity": 1,
+      "transform": "translate(" + scales.x(d.x) + "," + scales.y(d.y) + ")"
+    })
+    .text(d.x + ", " + d.y);
+}
