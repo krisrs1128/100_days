@@ -221,7 +221,7 @@ function update_ts_focus(elem, ts_data, cur_cluster, facet_offset, fill_cols, fa
     .append("path")
     .attrs({
       "class": "highlighted_series",
-      "stroke": "black",
+      "stroke": function(d) { return fill_cols(d[0].fill); },
       "d": line,
       "transform": function(d) {
         return "translate(0," + facet_offset(d[0].cluster) + ")";
@@ -244,7 +244,7 @@ function update_ts_focus(elem, ts_data, cur_cluster, facet_offset, fill_cols, fa
     .data(means).enter()
     .append("path")
     .attrs({
-      "stroke": "black",
+      "stroke": function(d) { return fill_cols(d[0].fill); },
       "class": "centroid"
     });
 
@@ -388,9 +388,9 @@ function scales_dictionary(tree, data, opts, max_cluster) {
     "centroid_y": d3.scaleLinear()
       .domain(d3.extent(fill_intensity))
       .range([opts.facet_y_prop * opts.elem_height / max_cluster - 10, 0]),
-    "fill_cols": d3.scaleBand()
+    "fill_cols": d3.scaleOrdinal()
       .domain(fill_cols)
-      .range(["#555", '#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854']),
+      .range(['#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854']),
     "facet_offset": d3.scaleBand()
       .domain(d3.range(max_cluster, 0, -1))
       .range([0, opts.facet_y_prop * opts.elem_height]),
