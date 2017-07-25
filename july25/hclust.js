@@ -33,7 +33,6 @@ d3.select("body")
       if (max_cluster < opts.n_clusters) {
         max_cluster += 1;
         cur_cluster = max_cluster;
-        scales.histo_offset.domain(d3.range(1, max_cluster + 2));
         scales.facet_offset.domain(d3.range(max_cluster, 0, -1));
         scales.centroid_y.range([opts.facet_y_prop * opts.elem_height / max_cluster - 10, 0]);
       }
@@ -156,7 +155,8 @@ elem.select("#tiles")
     "y": function(d) { return scales.tree_y(d.x); },
     "width": scales.tile_x.bandwidth(),
     "height": bandwidth,
-    "fill": function(d) { return scales.tile_fill(d.value, d.fill); }
+    "fill": function(d) { return scales.fill_cols(d.fill); },
+    "fill-opacity": function(d) { return scales.tile_fill(d.value); }
   });
 
 // Draw shades / covers on the heatmap
