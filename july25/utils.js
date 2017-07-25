@@ -131,10 +131,8 @@ function fill_counts(elem, n_clusters) {
   return cluster_counts;
 }
 
-function fill_averages(elem, data, n_clusters) {
+function fill_averages(elem, data, groups, fill_cols, n_clusters) {
   // initialize data in which we store results
-  var groups = extract_unique(data, "group");
-  var fill_cols = extract_unique(data, "fill");
   var cur_data = {};
   for (var i = 0; i < groups.length; i++) {
     cur_data[groups[i]] = {};
@@ -199,7 +197,13 @@ function group_array(elem, n_clusters) {
 
 function update_histo(elem, data, scales, n_clusters, histo_axis) {
   // reset scales
-  var averages = fill_averages(elem, data, n_clusters);
+  var averages = fill_averages(
+    elem,
+    data,
+    scales.histo_group.domain(),
+    scales.fill_cols.domain(),
+    n_clusters
+  );
   scales.histo_x.domain(
     [0, d3.max(averages.map(function(d) { return d.mean; }))]
   );
