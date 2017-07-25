@@ -110,25 +110,68 @@ function selected_ids(elem, n_clusters) {
   return cur_labels;
 }
 
-function group_counts(elem, n_clusters) {
+function fill_counts(elem, n_clusters) {
   var cluster_counts = {};
   for (var k = 1; k <= n_clusters; k++) {
     var cur_ids = elem.select("#subtree_" + k)
         .selectAll(".hcnode").data()
         .map(id_fun);
-    var groups = data.filter(function(d) { return d.row == "D1"; })
+    var fill_cols = data.filter(function(d) { return d.row == "D1"; })
         .filter(function(d) { return cur_ids.indexOf(d.column) != -1; })
-        .map(function(d) { return d.group; });
+        .map(function(d) { return d.fill; });
 
     var counts = {};
-    for(var i = 0; i < groups.length; i++) {
-      var group = groups[i];
-      counts[group] = counts[group] ? counts[group]+1 : 1;
+    for(var i = 0; i < fill_cols.length; i++) {
+      var fill = fill_cols[i];
+      counts[fill] = counts[fill] ? counts[fill]+1 : 1;
     }
     cluster_counts[k] = counts;
   }
 
   return cluster_counts;
+}
+
+function fill_averages(elem, data, n_clusters) {
+  // initialize data in which we store results
+  var groups = extract_unique(data, "group");
+  var fill_cols = extract_unique(data, "fill");
+  var cur_data = {};
+  for (var i = 0; i < groups.length; i++) {
+    cur_data[groups[i]] = {};
+    for (var j = 0; j < fill_cols.length; j++) {
+      cur_data[groups[i]][fill_cols[j]] = [0];
+    }
+  }
+
+  // identify rows in at least one subtree
+  var cur_ids = [];
+  for (var k = 1; k <= n_clusters; k++) {
+    cur_ids = cur_ids.concat(
+      elem.select("#subtree_" + k)
+        .selectAll(".hcnode").data()
+        .map(id_fun)
+    );
+  }
+
+  // extract data to use in histogram
+  for (var i = 0; i < data.length; i++) {
+    if (cur_ids.indexOf(data[i].column) != -1) {
+      cur_data[data[i].group][data[i].fill].push(data[i].value);
+    }
+  }
+
+  var averages = [];
+  for (var i = 0; i < groups.length; i++) {
+    for (var j = 0; j < fill_cols.length; j++) {
+      averages.push({
+        "group": groups[i],
+        "fill": fill_cols[j],
+        "mean": d3.mean(cur_data[groups[i]][fill_cols[j]])
+      });
+    }
+  }
+
+  return averages;
 }
 
 function counts_array(counts) {
@@ -154,11 +197,11 @@ function group_array(elem, n_clusters) {
   );
 }
 
-function update_histo(elem, scales, n_clusters, histo_axis) {
+function update_histo(elem, data, scales, n_clusters, histo_axis) {
   // reset scales
-  var counts = group_array(elem, n_clusters);
+  var averages = fill_averages(elem, data, n_clusters);
   scales.histo_x.domain(
-    [0, d3.max(counts.map(function(d) { return d.count; }))]
+    [0, d3.max(averages.map(function(d) { return d.mean; }))]
   );
 
   elem.transition()
@@ -168,20 +211,20 @@ function update_histo(elem, scales, n_clusters, histo_axis) {
 
   elem.select("#group_histo")
     .selectAll(".histo_bar")
-    .data(counts, function(d) { return d.cluster + d.group; }).enter()
+    .data(averages, function(d) { return d.fill + d.group; }).enter()
     .append("rect")
     .attrs({
      "class": "histo_bar",
       "x": scales.centroid_x.range()[0],
       "width": 0,
-      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.cluster);},
+      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.fill);},
       "height": scales.histo_offset.step(),
-      "fill": function(d) { return "black"; }
+      "fill": function(d) { return scales.fill_cols(d.fill); }
     });
 
   elem.select("#group_histo")
     .selectAll(".histo_bar")
-    .data(counts, function(d) { return d.cluster + d.group; }).exit()
+    .data(averages, function(d) { return d.fill + d.group; }).exit()
     .attrs({"width": 0})
     .remove();
 
@@ -190,8 +233,8 @@ function update_histo(elem, scales, n_clusters, histo_axis) {
     .transition()
     .duration(700)
     .attrs({
-      "width": function(d) { return scales.histo_x(d.count); },
-      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.cluster);},
+      "width": function(d) { return scales.histo_x(d.mean); },
+      "y": function(d) {return scales.histo_group(d.group) + scales.histo_offset(d.fill);},
       "height": scales.histo_offset.step()
     });
 }
@@ -306,22 +349,23 @@ function update_wrapper(d) {
   );
   update_histo(
     elem,
+    data,
     scales,
     opts.n_clusters,
     histo_axis
   );
 }
 
-function elemwise_mean(x_array, fills) {
+function elemwise_mean(x_array, fill_cols) {
   var means = [];
-  for (var j = 0; j < fills.length; j++) {
-    var array_sub = x_array.filter(function(d) { return d[0].fill == fills[j]; });
+  for (var j = 0; j < fill_cols.length; j++) {
+    var array_sub = x_array.filter(function(d) { return d[0].fill == fill_cols[j]; });
     var fill_mean = [];
     for (var t = 0; t < array_sub[0].length; t++) {
       fill_mean.push(
         {
           "cluster": array_sub[0][0].cluster,
-          "fill": fills[j],
+          "fill": fill_cols[j],
           "facet_x": array_sub[0][t].facet_x,
           "value": d3.mean(array_sub.map(function(x) { return x[t].value; }))
         }
@@ -374,7 +418,7 @@ function scales_dictionary(tree, data, opts, max_cluster) {
       .range([10 + opts.tree_x_prop * opts.elem_width, (1 - opts.facet_x_prop) * opts.elem_width]),
     "tile_fill": d3.scaleLinear()
       .domain(d3.extent(fill_intensity))
-      .range(["#f8f8f8", "black"]),
+      .range([0, 1]),
     "tree_x": d3.scaleLinear()
       .domain(d3.extent(coords.y))
       .range([opts.tree_x_prop * opts.elem_width, 0]),
@@ -400,7 +444,7 @@ function scales_dictionary(tree, data, opts, max_cluster) {
       .domain(groups)
       .range([30 + opts.facet_y_prop * opts.elem_height, opts.elem_height]),
     "histo_offset": d3.scaleBand()
-      .domain([1, 2])
+      .domain(fill_cols.concat(["dummy"]))
       .range([0, (opts.facet_y_prop * opts.elem_height - 30) / groups.length])
   };
 
