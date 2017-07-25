@@ -197,17 +197,16 @@ function update_histo(elem, scales, n_clusters, histo_axis) {
 }
 
 function update_ts_focus(elem, ts_data, cur_cluster, facet_offset, fill_cols, facets_x) {
+  // need a deep copy of current cluster, so that we can rename the .cluster
+  // field when binding to the actual elements
   var cluster_data0 = ts_data.filter(function(d) {
     if (typeof(d[0].cluster) == "undefined") {
       return false;
     }
     return d[0].cluster.indexOf(cur_cluster) != -1;
   });
-  var cluster_data = [];
-  for (var i = 0; i < cluster_data0.length; i++) {
-    cluster_data.push($.extend(true, [], cluster_data0[i]));
-  }
 
+  var cluster_data = $.extend(true, [], cluster_data0);
   for (var i = 0; i < cluster_data.length; i++) {
     cluster_data[i][0].cluster = cur_cluster;
   }
