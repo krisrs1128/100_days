@@ -68,12 +68,14 @@ function tile_id_fun(d) {
 }
 
 function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale, y_scale, fill_color) {
-  elem.select("#subtree_" + cur_cluster)
+  d3.select(elem)
+    .select("#subtree_" + cur_cluster)
     .selectAll(".hcnode")
     .data(cluster_data, id_fun).exit()
     .remove();
 
-  elem.select("#subtree_" + cur_cluster)
+  d3.select(elem)
+    .select("#subtree_" + cur_cluster)
     .selectAll(".hcnode")
     .data(cluster_data, id_fun).enter()
     .append("circle")
@@ -87,7 +89,8 @@ function update_tree_focus(elem, cluster_data, cur_cluster, n_clusters, x_scale,
     });
 
   var highlight_ids = selected_ids(elem, n_clusters);
-  elem.select("#subtree_0")
+  d3.select(elem)
+    .select("#subtree_0")
     .selectAll(".hcnode")
     .attrs({
       "fill-opacity": function(d) {
@@ -113,7 +116,8 @@ function selected_ids(elem, n_clusters) {
 function group_counts(elem, n_clusters) {
   var cluster_counts = {};
   for (var k = 1; k <= n_clusters; k++) {
-    var cur_ids = elem.select("#subtree_" + k)
+    var cur_ids = d3.select(elem)
+        .select("#subtree_" + k)
         .selectAll(".hcnode").data()
         .map(id_fun);
     var groups = data.filter(function(d) { return d.row == "D1"; })
