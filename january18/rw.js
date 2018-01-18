@@ -10,7 +10,7 @@ var margin = {top: 0, right: 0, bottom: 0, left: 0};
 var opts = {
   "elem_width": 200,
   "elem_height": 200,
-  "delta": 10,
+  "delta": 5,
   "radius": 4
 };
 
@@ -33,14 +33,20 @@ var elem = svg_elem.append("g")
 opts.elem_width = opts.elem_width - margin.right - margin.left;
 opts.elem_height = opts.elem_height - margin.top - margin.bottom;
 
-d3.timer(animate, 2000);
+d3.interval(animate, 50);
+
+var colscale = d3.interpolatePRGn;
+var color_domain = d3.scaleLinear()
+    .domain([1, opts.radius])
+    .range([0, 1]);
 
 circles = [
   {
-    "r": opts.radius,
     "index": 0,
     "x": opts.elem_width / 2,
-    "y": opts.elem_height / 2
+    "y": opts.elem_height / 2,
+    "r": opts.radius,
+    "fill": colscale(1)
   }
 ];
 
@@ -70,7 +76,8 @@ function animate(elapsed) {
     "index": last_circle.index + 1,
     "r": opts.radius,
     "x": last_circle.x + (Math.random() - 0.5) * opts.delta,
-    "y": last_circle.y + (Math.random() - 0.5) * opts.delta
+    "y": last_circle.y + (Math.random() - 0.5) * opts.delta,
+    "fill": colscale(1)
   });
 
   var circles_elem = svg_elem.selectAll("circle")
@@ -83,7 +90,7 @@ function animate(elapsed) {
   circles_elem.attrs({
     "cx": function(d) { return add_modulo(d.x, opts.elem_width); },
     "cy": function(d) { return add_modulo(d.y, opts.elem_height); },
-    "fill": "black",
+    "fill": function(d) { return colscale(color_domain(d.r)); },
     "r": function(d) { return d.r; }
   });
 }
