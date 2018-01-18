@@ -10,8 +10,8 @@ var margin = {top: 0, right: 0, bottom: 0, left: 0};
 var opts = {
   "elem_width": 200,
   "elem_height": 200,
-  "delta": 5,
-  "radius": 2
+  "delta": 10,
+  "radius": 4
 };
 
 // Create background rectangle
@@ -33,10 +33,11 @@ var elem = svg_elem.append("g")
 opts.elem_width = opts.elem_width - margin.right - margin.left;
 opts.elem_height = opts.elem_height - margin.top - margin.bottom;
 
-d3.timer(animate);
+d3.timer(animate, 2000);
 
 circles = [
   {
+    "r": opts.radius,
     "index": 0,
     "x": opts.elem_width / 2,
     "y": opts.elem_height / 2
@@ -55,6 +56,15 @@ function add_modulo(x, h) {
 }
 
 function animate(elapsed) {
+  for(var i = 0; i < circles.length; i++) {
+    circles[i].r *= 0.99;
+  }
+  circles = circles.filter(
+    function(d) {
+      return d.r > 1;
+    }
+  );
+
   var last_circle = circles[circles.length - 1];
   circles.push({
     "index": last_circle.index + 1,
@@ -68,6 +78,7 @@ function animate(elapsed) {
 
   circles_elem.enter()
     .append("circle");
+  circles_elem.exit().remove();
 
   circles_elem.attrs({
     "cx": function(d) { return add_modulo(d.x, opts.elem_width); },
